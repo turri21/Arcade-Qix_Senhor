@@ -3,11 +3,11 @@
 // Qix Audio Board
 // Copyright (C) 2026 Rodimus
 //
-// Hardware: MC6802 audio CPU (jt680x core) + 2× PIA6821 + 8-bit DAC +
+// Hardware: MC6802 audio CPU (cpu68 core) + 2× PIA6821 + 8-bit DAC +
 //           discrete stereo volume attenuator
 //
 // Responsibilities:
-//   - Audio CPU (~0.91 MHz, jt680x with cen at 20 MHz ÷ 22 ≈ 909 kHz)
+//   - Audio CPU (~0.91 MHz, cpu68 with hold-gated clocking at 20 MHz)
 //   - Receives sound commands from data CPU via sndPIA1 port A
 //   - 8-bit unsigned DAC via sndPIA1 port B
 //   - Stereo volume scaling from data CPU sndPIA0 port B
@@ -44,15 +44,17 @@ module Qix_Sound (
 // ---------------------------------------------------------------------------
 wire [15:0] snd_A;
 wire [7:0]  snd_Dout;
-wire [7:0]  snd_Din;   // assigned at bottom by read mux
-wire        snd_wr;    // 1 = write (jt680x polarity)
-wire        snd_rw = ~snd_wr;  // 1 = read — passed to PIAs
+wire [7:0]  snd_Din;           // assigned at bottom by read mux
+wire        snd_rw;            // 1 = read, 0 = write (active-high read, directly from cpu68)
+wire        snd_vma;           // 1 = valid memory address (active bus cycle)
+wire        snd_wr = ~snd_rw;  // convenience: 1 = write
 
 // ---------------------------------------------------------------------------
 // Clock enable: ~0.91 MHz (20 MHz ÷ 22 = 909 kHz, within 1.6% of 895 kHz target)
 //
-// jt680x uses a cen (clock enable) port instead of a hold gate.
-// Pause is applied by gating cen — when paused no cen pulses reach the CPU.
+// cpu68 advances state on the falling edge of clk when hold=0.
+// We assert hold on all cycles except one tick per divide period.
+// Pause is applied by forcing hold=1 permanently.
 // ---------------------------------------------------------------------------
 reg [4:0] snd_div;
 always @(posedge clk_20m)
@@ -61,60 +63,61 @@ always @(posedge clk_20m)
 
 wire snd_cen_raw = (snd_div == 5'd0);
 wire snd_cen     = snd_cen_raw & ~pause;
+wire snd_hold    = ~snd_cen;     // hold CPU except during active tick
 
 // ---------------------------------------------------------------------------
-// Address decoder — jt680x address bus is always valid (no VMA)
+// Address decoder — qualified by VMA from cpu68
 // ---------------------------------------------------------------------------
 wire sndpia2_cs_addr = (snd_A[15:13] == 3'b001);   // $2000-$3FFF
 wire sndpia1_cs_addr = (snd_A[15:14] == 2'b01);    // $4000-$7FFF
 wire rom_cs          = (snd_A[15:11] == 5'b11111);  // $F800-$FFFF
 
-// Single-cycle PIA enables: fire only during the active CPU tick
-wire sndpia2_en = snd_cen & sndpia2_cs_addr;
-wire sndpia1_en = snd_cen & sndpia1_cs_addr;
+// PIA enables: active during valid bus cycles at the active CPU tick
+// cpu68 drives vma=1 when the bus cycle is real (not idle/dead cycle)
+wire sndpia2_en = snd_cen & snd_vma & sndpia2_cs_addr;
+wire sndpia1_en = snd_cen & snd_vma & sndpia1_cs_addr;
 
 // ---------------------------------------------------------------------------
 // 6802 internal RAM — 128 bytes ($0000-$007F)
-// jt680x is a pure CPU core and does NOT include internal RAM.
+// cpu68 is a pure CPU core and does NOT include internal RAM.
 // ---------------------------------------------------------------------------
 reg [7:0] internal_ram [0:127];
 wire internal_ram_cs   = (snd_A[15:7] == 9'd0);    // $0000-$007F
 wire [7:0] internal_ram_dout = internal_ram[snd_A[6:0]];
 
 always @(posedge clk_20m)
-    if (snd_cen && snd_wr && internal_ram_cs)
+    if (snd_cen && snd_vma && snd_wr && internal_ram_cs)
         internal_ram[snd_A[6:0]] <= snd_Dout;
 
 // ---------------------------------------------------------------------------
-// jt680x — MC6802 compatible audio CPU
-//   rst      : active-high reset
-//   cen      : clock enable at crystal/4 rate (~909 kHz)
-//   wr       : active-high write (snd_rw = ~snd_wr for PIAs)
-//   ext_halt : pause the CPU (bus available, active high)
-//   irq      : active-high IRQ (OR of all PIA IRQ outputs)
-//   nmi      : active-high NMI — tie low (not used)
-//   6801 timer/serial interrupts: tie to 0 (not 6801 features)
+// cpu68 — MC6800/6802 compatible audio CPU (John Kent, OpenCores)
+//   rst      : active-high synchronous reset
+//   hold     : active-high, freezes state machine (used for clock gating)
+//   halt     : active-high, halts CPU at next fetch (active high)
+//   irq      : active-high IRQ
+//   nmi      : active-high NMI — tie low (not used by Qix)
+//   rw       : active-high read (directly drives PIAs)
+//   vma      : valid memory address — 1 when bus cycle is real
+//
+// NOTE: cpu68 advances on the FALLING edge of clk.
+//       hold=1 freezes it. We gate hold to get ~909 kHz effective rate.
 // ---------------------------------------------------------------------------
 wire snd_irq;
 
-jt680x audio_cpu (
-    .rst      (reset),
+cpu68 audio_cpu (
     .clk      (clk_20m),
-    .cen      (snd_cen),
-    .wr       (snd_wr),
-    .addr     (snd_A),
-    .din      (snd_Din),
-    .dout     (snd_Dout),
-    .ext_halt (pause),
-    .ba       (),
+    .rst      (reset),
+    .rw       (snd_rw),
+    .vma      (snd_vma),
+    .address  (snd_A),
+    .data_in  (snd_Din),
+    .data_out (snd_Dout),
+    .hold     (snd_hold),
+    .halt     (1'b0),
     .irq      (snd_irq),
     .nmi      (1'b0),
-    .irq_icf  (1'b0),
-    .irq_ocf  (1'b0),
-    .irq_tof  (1'b0),
-    .irq_sci  (1'b0),
-    .irq_cmf  (1'b0),
-    .irq2     (1'b0)
+    .test_alu (),
+    .test_cc  ()
 );
 
 // ---------------------------------------------------------------------------
@@ -216,7 +219,8 @@ end
 
 // ---------------------------------------------------------------------------
 // CPU data bus read mux — default $FF for unmapped regions
-// Internal 6802 RAM ($0000-$007F) now handled externally via internal_ram.
+// Internal 6802 RAM ($0000-$007F) handled externally since cpu68 has no
+// built-in RAM (unlike the real MC6802 silicon).
 // ---------------------------------------------------------------------------
 assign snd_Din =
     internal_ram_cs ? internal_ram_dout :

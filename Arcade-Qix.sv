@@ -296,7 +296,7 @@ pll pll
 	.locked(locked)
 );
 
-wire reset = RESET | status[0] | buttons[1];
+wire reset = RESET | status[0] | buttons[1] | ioctl_download;
 
 ///////////////////         Keyboard           //////////////////
 
@@ -310,6 +310,7 @@ reg btn_coin2    = 0;
 reg btn_1p_start = 0;
 reg btn_2p_start = 0;
 reg btn_pause    = 0;
+reg btn_service  = 0;
 
 wire pressed = ps2_key[9];
 wire [7:0] code = ps2_key[7:0];
@@ -323,13 +324,14 @@ always @(posedge CLK_20M) begin
 			'h2E: btn_coin1    <= pressed; // 5
 			'h36: btn_coin2    <= pressed; // 6
 			'h4D: btn_pause    <= pressed; // P
+			'h46: btn_service  <= pressed; // 9
 
-			'h75: btn_up      <= pressed; // up
-			'h72: btn_down    <= pressed; // down
-			'h6B: btn_left    <= pressed; // left
-			'h74: btn_right   <= pressed; // right
-			'h14: btn_fire    <= pressed; // ctrl
-		endcase
+			'h75: btn_up       <= pressed; // up
+			'h72: btn_down     <= pressed; // down
+			'h6B: btn_left     <= pressed; // left
+			'h74: btn_right    <= pressed; // right
+			'h14: btn_fire     <= pressed; // ctrl
+		endcase 
 	end
 end
 
@@ -345,6 +347,7 @@ wire m_coin1   = btn_coin1 | joystick_0[5];
 wire m_start1  = btn_1p_start | joystick_0[6];
 wire m_start2  = btn_2p_start | joystick_0[7];
 wire m_pause   = btn_pause | joystick_0[8];
+wire m_service = btn_service;
 
 wire m_up2     = joystick_1[3];
 wire m_down2   = joystick_1[2];
@@ -393,8 +396,8 @@ arcade_video #(256,24) arcade_video
 	.RGB_in(rgb_out),
 	.HBlank(hblank),
 	.VBlank(vblank),
-	.HSync(~hs),
-	.VSync(~vs),
+	.HSync(hs),
+	.VSync(vs),
 
 	.fx(status[17:15])
 );
@@ -402,7 +405,7 @@ arcade_video #(256,24) arcade_video
 //Instantiate Qix top-level platform module
 Qix QIX_inst
 (
-	.reset(~reset),
+	.reset(reset),
 	.clk_20m(CLK_20M),
 
 	.coin({~m_coin2, ~m_coin1}),
@@ -412,7 +415,9 @@ Qix QIX_inst
 	.p2_joystick({~m_right2, ~m_left2, ~m_down2, ~m_up2}),
 	.p1_fire(~m_fire1),
 	.p2_fire(~m_fire2),
-
+	
+	.service(~m_service),
+	
 	.dip_sw({~dip_sw[1], ~dip_sw[0]}),
 
 	.video_hsync(hs),
@@ -428,10 +433,10 @@ Qix QIX_inst
 	.sound_l(audio_l),
 	.sound_r(audio_r),
 
-	.ioctl_addr(ioctl_addr),
-	.ioctl_wr(ioctl_wr),
-	.ioctl_data(ioctl_dout),
-	.ioctl_index(ioctl_index),
+    .ioctl_addr(ioctl_addr),
+    .ioctl_wr(ioctl_wr && (ioctl_index == 8'd0)),
+    .ioctl_data(ioctl_dout),
+    .ioctl_index(ioctl_index),
 
 	.pause(pause_cpu),
 

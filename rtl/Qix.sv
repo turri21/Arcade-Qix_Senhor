@@ -26,6 +26,9 @@ module Qix (
     input  [3:0]  p2_joystick,
     input         p1_fire,
     input         p2_fire,
+    
+    input         service,        // Test Advance button (active-low)
+    
     input  [15:0] dip_sw,
 
     // Video output
@@ -73,10 +76,8 @@ wire cpu_Q = clk_div[3] ^ clk_div[2];
 
 // ---------------------------------------------------------------------------
 // Shared 1KB dual-port RAM (port A = data CPU, port B = video CPU)
-// Quartus infers true dual-port M10K from two independent always blocks.
+// Explicit dpram_dc to guarantee M10K inference.
 // ---------------------------------------------------------------------------
-reg [7:0] shared_ram [0:1023];
-
 wire [9:0] cpu_sh_addr;
 wire [7:0] cpu_sh_din;
 wire [7:0] cpu_sh_dout;
@@ -87,15 +88,19 @@ wire [7:0] vid_sh_din;
 wire [7:0] vid_sh_dout;
 wire        vid_sh_we;
 
-// Port A — data CPU
-always @(posedge clk_20m)
-    if (cpu_sh_we) shared_ram[cpu_sh_addr] <= cpu_sh_din;
-assign cpu_sh_dout = shared_ram[cpu_sh_addr];
+dpram_dc #(.widthad_a(10)) shared_ram_inst (
+    .clock_a    (clk_20m),
+    .address_a  (cpu_sh_addr),
+    .data_a     (cpu_sh_din),
+    .wren_a     (cpu_sh_we),
+    .q_a        (cpu_sh_dout),
 
-// Port B — video CPU
-always @(posedge clk_20m)
-    if (vid_sh_we) shared_ram[vid_sh_addr] <= vid_sh_din;
-assign vid_sh_dout = shared_ram[vid_sh_addr];
+    .clock_b    (clk_20m),
+    .address_b  (vid_sh_addr),
+    .data_b     (vid_sh_din),
+    .wren_b     (vid_sh_we),
+    .q_b        (vid_sh_dout)
+);
 
 // ---------------------------------------------------------------------------
 // ROM ioctl address-range dispatch (concatenated ROM, all ioctl_index == 0)
@@ -121,6 +126,25 @@ wire snd_ioctl_wr = ioctl_wr & (ioctl_addr >= 25'h08000) & (ioctl_addr < 25'h088
 wire cpu_video_firq;   // from Qix_CPU
 wire vid_data_firq;    // from Qix_Video
 
+// Delay VSYNC to Data CPU until CRTC is programmed.
+// Hold CB1 low for ~0.5 sec after reset (10M clocks at 20MHz)
+// to let the Video CPU program CRTC registers.
+reg [23:0] vsync_delay;
+reg        vsync_enable;
+always @(posedge clk_20m) begin
+    if (reset) begin
+        vsync_delay  <= 24'd0;
+        vsync_enable <= 1'b0;
+    end else if (!vsync_enable) begin
+        vsync_delay <= vsync_delay + 24'd1;
+        if (vsync_delay == 24'd10_000_000)  // ~0.5 sec
+            vsync_enable <= 1'b1;
+    end
+end
+
+wire crtc_vsync_out;
+wire crtc_vsync_gated = vsync_enable ? crtc_vsync_out : 1'b0;
+
 wire data_firq_n  = ~vid_data_firq;    // active-low to Qix_CPU
 wire video_firq_n = ~cpu_video_firq;   // active-low to Qix_Video
 
@@ -141,11 +165,11 @@ wire        flip;             // Qix_CPU sndPIA0 CB2 → Qix_Video flip
 // PIA0 port B (COIN): [7]=tilt [6]=coin2 [5]=coin1 [4]=service [3:0]=1
 // PIA2 port A (P2): [7]=fire [6:4]=1 [3:0]={R,L,D,U}
 // ---------------------------------------------------------------------------
-wire [7:0] p1_pia   = {p1_fire, start_buttons[0], start_buttons[1], 1'b1,
-                        p1_joystick[3], p1_joystick[2], p1_joystick[1], p1_joystick[0]};
-wire [7:0] coin_pia = {1'b1, coin[1], coin[0], 1'b1, 4'b1111};
-wire [7:0] p2_pia   = {p2_fire, 3'b111,
-                        p2_joystick[3], p2_joystick[2], p2_joystick[1], p2_joystick[0]};
+wire [7:0] p1_pia   = {1'b1, start_buttons[0], start_buttons[1], p1_fire,
+                        p1_joystick[2], p1_joystick[1], p1_joystick[3], p1_joystick[0]};
+wire [7:0] coin_pia = {1'b1, coin[1], coin[0], 1'b1, 3'b111, service};
+wire [7:0] p2_pia   = {1'b1, 3'b111,
+                        p2_joystick[2], p2_joystick[1], p2_joystick[3], p2_joystick[0]};
 
 // ---------------------------------------------------------------------------
 // Qix_CPU — data CPU board
@@ -169,6 +193,8 @@ Qix_CPU cpu_board (
     .spare_input     (8'hFF),
     .in0_input       (8'hFF),
     .p2_input        (p2_pia),
+
+    .crtc_vsync      (crtc_vsync_gated),
 
     .snd_data_out    (snd_cmd),
     .snd_vol_out     (snd_vol),
@@ -208,7 +234,7 @@ Qix_Video video_board (
     .video_r         (video_r),
     .video_g         (video_g),
     .video_b         (video_b),
-    .crtc_vsync      (),
+    .crtc_vsync      (crtc_vsync_out),
 
     .ioctl_addr      (ioctl_addr),
     .ioctl_data      (ioctl_data),

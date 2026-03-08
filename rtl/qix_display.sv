@@ -107,7 +107,7 @@ mc6845 crtc (
 //     bits [ 7: 3] = 0
 //     bits [ 2: 0] = pix_cnt
 // ---------------------------------------------------------------------------
-assign display_addr = {crtc_ma[9:5], crtc_ra[2:0], 5'b0, pix_cnt};
+assign display_addr = {crtc_ma[9:5], crtc_ra[2:0], crtc_ma[4:0], pix_cnt};
 
 // ---------------------------------------------------------------------------
 // Palette feed: raw VRAM byte is the palette index
@@ -117,6 +117,12 @@ assign pixel_index = display_data;
 // ---------------------------------------------------------------------------
 // RGB output — palette result, forced black outside active display area
 // ---------------------------------------------------------------------------
+// DEBUG: Force RGB output to non-black to verify video chain
+// Remove this after testing!
+// assign video_r = 8'hFF;
+// assign video_g = 8'h00;
+// assign video_b = 8'h00;
+
 assign video_r = crtc_de ? rgb_r : 8'd0;
 assign video_g = crtc_de ? rgb_g : 8'd0;
 assign video_b = crtc_de ? rgb_b : 8'd0;

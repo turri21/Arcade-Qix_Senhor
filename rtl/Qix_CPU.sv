@@ -43,6 +43,8 @@ module Qix_CPU (
     input         snd_irq_from_snd,// CA1 ← sound CPU interrupt
     output        flip_screen,    // CB2 → cocktail flip
 
+    input         crtc_vsync,    // CRTC VSYNC → sndPIA0 CB1 (frame timing)
+
     // ROM loading (MiSTer ioctl — pre-gated by address range in Qix.sv)
     input  [24:0] ioctl_addr,
     input  [7:0]  ioctl_data,
@@ -176,6 +178,23 @@ wire       sndpia_ca2_o, sndpia_ca2_oe;
 wire       sndpia_cb2_o, sndpia_cb2_oe;
 wire       sndpia_irqa, sndpia_irqb;
 
+// VSYNC-driven IRQ — bypass sndPIA0 CB1 (PIA mixed-edge synthesis issue)
+reg vsync_prev;
+reg vsync_irq;
+always @(posedge clk_20m) begin
+    if (reset) begin
+        vsync_prev <= 1'b0;
+        vsync_irq  <= 1'b0;
+    end else begin
+        vsync_prev <= crtc_vsync;
+        if (~vsync_prev & crtc_vsync)          // rising edge of vsync
+            vsync_irq <= 1'b1;
+        else if (cpu_E_fall & sndpia_cs & cpu_RnW & (cpu_A[1:0] == 2'b10))
+            vsync_irq <= 1'b0;                 // cleared on READ of sndPIA0 port B
+    end
+end
+
+
 pia6821 sndpia0 (
     .clk      (clk_20m),
     .rst      (reset),
@@ -196,7 +215,7 @@ pia6821 sndpia0 (
     .pb_i     (8'h00),
     .pb_o     (sndpia_pb_o),
     .pb_oe    (sndpia_pb_oe),
-    .cb1      (1'b0),
+    .cb1      (1'b0),           // .cb1      (crtc_vsync),
     .cb2_i    (1'b1),
     .cb2_o    (sndpia_cb2_o),
     .cb2_oe   (sndpia_cb2_oe)
@@ -208,7 +227,8 @@ assign snd_irq_to_snd = sndpia_ca2_o;
 assign flip_screen    = sndpia_cb2_o;
 
 // IRQ to data CPU: active-low merge of sndPIA0 IRQA and IRQB
-assign n_irq = ~(sndpia_irqa | sndpia_irqb);
+assign n_irq = ~(sndpia_irqa | sndpia_irqb | vsync_irq);
+//assign n_irq = ~(sndpia_irqa | sndpia_irqb);
 
 // ---------------------------------------------------------------------------
 // PIA0 ($9400-$97FF) — player 1 joystick + coin inputs

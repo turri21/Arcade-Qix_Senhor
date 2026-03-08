@@ -97,17 +97,23 @@ wire cpu_wr     = cpu_E_fall & ~cpu_RnW;
 // Address decoder
 // ---------------------------------------------------------------------------
 wire vram_direct_cs  =  ~cpu_A[15];                                // $0000-$7FFF
-wire shared_cs       = (cpu_A[15:10] == 6'b10_0000);              // $8000-$83FF
-wire nvram_cs        = (cpu_A[15:10] == 6'b10_0001);              // $8400-$87FF
-wire palbank_cs      = (cpu_A        == 16'h8800);                 // $8800
-wire firq_assert_cs  = (cpu_A        == 16'h8C00);                 // $8C00
-wire firq_ack_cs     = (cpu_A        == 16'h8C01);                 // $8C01
-wire palette_cs      = (cpu_A[15:10] == 6'b10_0100);              // $9000-$93FF
-wire vram_latch_cs   = (cpu_A        == 16'h9400);                 // $9400
-wire latch_hi_cs     = (cpu_A        == 16'h9402);                 // $9402
-wire latch_lo_cs     = (cpu_A        == 16'h9403);                 // $9403
-wire scanline_cs     = (cpu_A[15:10] == 6'b10_0110);              // $9800 (partial)
-wire crtc_bus_cs     = (cpu_A[15:2]  == 14'h2700);                // $9C00-$9C01
+wire shared_cs       = (cpu_A[15:10] == 6'b10_0000);               // $8000-$83FF
+wire nvram_cs        = (cpu_A[15:10] == 6'b10_0001);               // $8400-$87FF
+wire palbank_cs      = (cpu_A[15:10] == 6'b10_0010);               // $8800-$8BFF (VS2)
+wire firq_range      = (cpu_A[15:10] == 6'b10_0011);               // $8C00-$8FFF (VS3)
+wire firq_assert_cs  = firq_range & ~cpu_A[0];                     // even: assert
+wire firq_ack_cs     = firq_range &  cpu_A[0];                     // odd: ack
+wire palette_cs      = (cpu_A[15:10] == 6'b10_0100);               // $9000-$93FF
+
+// VS5 chip select: $9400-$97FF (bits [9:2] don't-care, bits [1:0] select function)
+wire vs5_cs          = (cpu_A[15:10] == 6'b10_0101);               // $9400-$97FF
+wire vram_latch_cs   = vs5_cs & (cpu_A[1:0] == 2'b00);             // xx00: VRAM latch r/w
+wire latch_hi_cs     = vs5_cs & (cpu_A[1:0] == 2'b10);             // xx10: addr latch hi
+wire latch_lo_cs     = vs5_cs & (cpu_A[1:0] == 2'b11);             // xx11: addr latch lo
+
+wire scanline_cs     = (cpu_A[15:10] == 6'b10_0110);               // $9800 (partial)
+wire crtc_range      = (cpu_A[15:10] == 6'b10_0111);               // $9C00-$9FFF (VS7)
+wire crtc_bus_cs     = crtc_range;                                 // active for full range
 wire rom_cs          = (cpu_A[15:14] == 2'b11);                    // $C000-$FFFF
 
 // ---------------------------------------------------------------------------
@@ -260,25 +266,24 @@ assign crtc_vsync = vsync;
 // ---------------------------------------------------------------------------
 // NVRAM — 1KB BRAM ($8400-$87FF)
 // Port A: Video CPU  |  Port B: hiscore framework
-// Quartus infers true dual-port M10K from two independent always blocks.
+// Explicit dpram_dc for reliable M10K inference.
 // ---------------------------------------------------------------------------
-reg [7:0] nvram [0:1023];
-reg [7:0] nvram_cpu_dout;
-reg [7:0] nvram_hs_dout;
+wire [7:0] nvram_cpu_dout;
+wire [7:0] nvram_hs_dout;
 
-// Port A — CPU read/write
-always @(posedge clk_20m) begin
-    if (nvram_cs & cpu_wr)
-        nvram[cpu_A[9:0]] <= cpu_Dout;
-    nvram_cpu_dout <= nvram[cpu_A[9:0]];
-end
+dpram_dc #(.widthad_a(10)) nvram_inst (
+    .clock_a    (clk_20m),
+    .address_a  (cpu_A[9:0]),
+    .data_a     (cpu_Dout),
+    .wren_a     (nvram_cs & cpu_wr),
+    .q_a        (nvram_cpu_dout),
 
-// Port B — hiscore read/write
-always @(posedge clk_20m) begin
-    if (hs_write)
-        nvram[hs_address[9:0]] <= hs_data_in;
-    nvram_hs_dout <= nvram[hs_address[9:0]];
-end
+    .clock_b    (clk_20m),
+    .address_b  (hs_address[9:0]),
+    .data_b     (hs_data_in),
+    .wren_b     (hs_write),
+    .q_b        (nvram_hs_dout)
+);
 
 assign hs_data_out = nvram_hs_dout;
 
