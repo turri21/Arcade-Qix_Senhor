@@ -229,8 +229,8 @@ localparam CONF_STR = {
 	"DIP;",
 	"-;",
 	"R0,Reset;",
-	"J1,Fire,Coin,Start 1P,Start 2P,Pause;",
-	"jn,A,Select,Start,R,L;",
+	"J1,Draw Slow,Draw Fast,Coin,Start 1P,Start 2P,Pause;",
+	"jn,A,B,Select,Start,R,L;",
 	"V,v",`BUILD_DATE
 };
 
@@ -354,12 +354,12 @@ wire m_up1     = btn_up    | joystick_0[3];
 wire m_down1   = btn_down  | joystick_0[2];
 wire m_left1   = btn_left  | joystick_0[1];
 wire m_right1  = btn_right | joystick_0[0];
-wire m_fire1   = btn_fire  | joystick_0[4];
-wire m_fire2_p1 = btn_fire2 | joystick_0[5]; // second button for P1 draw fast
-wire m_coin1   = btn_coin1 | joystick_0[5];
-wire m_start1  = btn_1p_start | joystick_0[6];
-wire m_start2  = btn_2p_start | joystick_0[7];
-wire m_pause   = btn_pause | joystick_0[8];
+wire m_btn1_p1 = btn_fire  | joystick_0[4];
+wire m_btn2_p1 = btn_fire2 | joystick_0[5];
+wire m_coin1   = btn_coin1 | joystick_0[6];
+wire m_start1  = btn_1p_start | joystick_0[7];
+wire m_start2  = btn_2p_start | joystick_0[8];
+wire m_pause   = btn_pause | joystick_0[9];
 wire m_service = btn_service;
 wire m_service2 = btn_service2;
 wire m_service3 = btn_service3;
@@ -369,8 +369,9 @@ wire m_up2     = joystick_1[3];
 wire m_down2   = joystick_1[2];
 wire m_left2   = joystick_1[1];
 wire m_right2  = joystick_1[0];
-wire m_fire2   = joystick_1[4];
-wire m_coin2   = joystick_1[5];
+wire m_btn1_p2 = joystick_1[4];
+wire m_btn2_p2 = joystick_1[5];
+wire m_coin2   = joystick_1[6];
 
 // PAUSE SYSTEM
 wire pause_cpu;
@@ -429,8 +430,10 @@ Qix QIX_inst
 
 	.p1_joystick({~m_right1, ~m_left1, ~m_down1, ~m_up1}),
 	.p2_joystick({~m_right2, ~m_left2, ~m_down2, ~m_up2}),
-	.p1_fire(~m_fire1),
-	.p2_fire(~m_fire2),
+	.p1_btn1(~m_btn1_p1),
+	.p1_btn2(~m_btn2_p1),
+	.p2_btn1(~m_btn1_p2),
+	.p2_btn2(~m_btn2_p2),
 	
 	.service(~m_service),
 	.service2(~m_service2),

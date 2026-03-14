@@ -24,8 +24,10 @@ module Qix (
     input  [1:0]  start_buttons,
     input  [3:0]  p1_joystick,    // {R,L,D,U}
     input  [3:0]  p2_joystick,
-    input         p1_fire,
-    input         p2_fire,
+    input         p1_btn1,        // Player 1 Draw Slow (active-low)
+    input         p1_btn2,        // Player 1 Draw Fast (active-low)
+    input         p2_btn1,        // Player 2 Draw Slow (active-low)
+    input         p2_btn2,        // Player 2 Draw Fast (active-low)
     
     input         service,        // Test Advance button (active-low)
     input         service2,
@@ -162,17 +164,19 @@ wire        snd_irq_snd2cpu;  // Qix_Sound sndPIA1 CA2 → Qix_CPU sndPIA0 CA1
 wire        flip;             // Qix_CPU sndPIA0 CB2 → Qix_Video flip
 
 // ---------------------------------------------------------------------------
-// PIA input assembly (all signals active-low from wrapper)
+// PIA input assembly — EXACT match to schematic Figure 16
 //
-// PIA0 port A (P1): [7]=button1 [6]=start1 [5]=start2 [4]=button2 [3:0]={L,D,R,U}
-// PIA0 port B (COIN): [7]=tilt [6]=coin3 [5]=coin2 [4]=coin1 [3:0]={svc4,svc3,svc2,svc1}
-// PIA2 port A (P2): [7]=button1 [6:4]=1 [3:0]={L,D,R,U}
+// PIA0 port A (U11 PA): [7]=Fire1 [6]=Start1 [5]=Start2 [4]=Spare/Button2 [3:0]={R,L,D,U}
+// PIA0 port B (U11 PB): [7]=Tilt [6]=Coin3 [5]=Coin2 [4]=Coin1 [3:0]={svc4,svc3,svc2,svc1}
+// PIA2 port A (U30 PA): [7]=Fire2 [6:4]=Spare [3:0]={R,L,D,U}
 // ---------------------------------------------------------------------------
-wire [7:0] p1_pia   = {1'b1, start_buttons[0], start_buttons[1], p1_fire,
-                        p1_joystick[2], p1_joystick[1], p1_joystick[3], p1_joystick[0]};
+wire [7:0] p1_pia   = {p1_btn1, start_buttons[0], start_buttons[1], p1_btn2,
+                        p1_joystick[0], p1_joystick[1], p1_joystick[2], p1_joystick[3]};  // R,L,D,U order
+
 wire [7:0] coin_pia = {1'b1, 1'b1, coin[1], coin[0], service4, service3, service2, service};
-wire [7:0] p2_pia   = {1'b1, 3'b111,
-                        p2_joystick[2], p2_joystick[1], p2_joystick[3], p2_joystick[0]};
+
+wire [7:0] p2_pia   = {p2_btn1, 3'b111,
+                        p2_joystick[0], p2_joystick[1], p2_joystick[2], p2_joystick[3]};  // R,L,D,U order
 
 // ---------------------------------------------------------------------------
 // Qix_CPU — data CPU board
