@@ -148,6 +148,7 @@ assign shared_we   = shared_cs & cpu_wr;
 // Local RAM — 1KB BRAM ($8400-$87FF)
 // ---------------------------------------------------------------------------
 reg [7:0] local_ram [0:1023];
+initial for (integer i = 0; i < 1024; i = i + 1) local_ram[i] = 8'h00;
 reg [7:0] local_ram_dout;
 
 always @(posedge clk_20m) begin
