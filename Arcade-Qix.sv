@@ -377,9 +377,9 @@ wire m_pause    = btn_pause     | joystick_0[9];
 
 //Service Mode
 wire m_service  = btn_service   | joystick_0[8];
-wire m_service2 = btn_service2;
-wire m_service3 = btn_service3;
-wire m_service4 = btn_service4;
+wire m_service2 = btn_service2                 ;
+wire m_service3 = btn_service3                 ;
+wire m_service4 = btn_service4                 ;
 
 // PAUSE SYSTEM
 wire pause_cpu;

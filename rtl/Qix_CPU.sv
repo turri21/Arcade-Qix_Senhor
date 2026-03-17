@@ -24,6 +24,7 @@ module Qix_CPU (
     output [7:0]  shared_din,
     input  [7:0]  shared_dout,
     output        shared_we,
+    output        shared_cs_o,
 
     // FIRQ cross-signals
     output        video_firq,     // assert FIRQ on video CPU (active-high pulse)
@@ -143,6 +144,7 @@ mc6809e data_cpu (
 assign shared_addr = cpu_A[9:0];
 assign shared_din  = cpu_Dout;
 assign shared_we   = shared_cs & cpu_wr;
+assign shared_cs_o = shared_cs;
 
 // ---------------------------------------------------------------------------
 // Local RAM — 1KB BRAM ($8400-$87FF)

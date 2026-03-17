@@ -28,6 +28,7 @@ module Qix_Video (
     output [7:0]  shared_dout,
     input  [7:0]  shared_din,
     output        shared_we,
+    output        shared_cs_o,
 
     // Cross-CPU FIRQ
     output        data_firq,    // pulse: video CPU asserts FIRQ on data CPU
@@ -123,6 +124,7 @@ wire rom_cs          = (cpu_A >= 16'hA000);                        // $A000-$FFF
 assign shared_addr = cpu_A[9:0];
 assign shared_dout = cpu_Dout;
 assign shared_we   = shared_cs & cpu_wr;
+assign shared_cs_o = shared_cs;
 
 /// ---------------------------------------------------------------------------
 // FIRQ access pulses (from schematic Figure 13, U7/U8):

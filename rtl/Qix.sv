@@ -87,21 +87,33 @@ wire [9:0] cpu_sh_addr;
 wire [7:0] cpu_sh_din;
 wire [7:0] cpu_sh_dout;
 wire        cpu_sh_we;
+wire        cpu_sh_cs;
 
 wire [9:0] vid_sh_addr;
 wire [7:0] vid_sh_din;
 wire [7:0] vid_sh_dout;
 wire        vid_sh_we;
+wire        vid_sh_cs;
+
+// Gated shared RAM — hold last valid address when CPU is not accessing
+// shared range, preventing cross-port noise from random bus traffic.
+reg [9:0] cpu_sh_addr_held;
+reg [9:0] vid_sh_addr_held;
+
+always @(posedge clk_20m) begin
+    if (cpu_sh_cs) cpu_sh_addr_held <= cpu_sh_addr;
+    if (vid_sh_cs) vid_sh_addr_held <= vid_sh_addr;
+end
 
 dpram_dc #(.widthad_a(10)) shared_ram_inst (
     .clock_a    (clk_20m),
-    .address_a  (cpu_sh_addr),
+    .address_a  (cpu_sh_cs ? cpu_sh_addr : cpu_sh_addr_held),
     .data_a     (cpu_sh_din),
     .wren_a     (cpu_sh_we),
     .q_a        (cpu_sh_dout),
 
-    .clock_b    (clk_20m),
-    .address_b  (vid_sh_addr),
+    .clock_b    (~clk_20m),
+    .address_b  (vid_sh_cs ? vid_sh_addr : vid_sh_addr_held),
     .data_b     (vid_sh_din),
     .wren_b     (vid_sh_we),
     .q_b        (vid_sh_dout)
@@ -210,6 +222,7 @@ Qix_CPU cpu_board (
     .shared_din      (cpu_sh_din),
     .shared_dout     (cpu_sh_dout),
     .shared_we       (cpu_sh_we),
+    .shared_cs_o     (cpu_sh_cs),
 
     .video_firq      (cpu_firq_assert),
     .data_firq_ack   (cpu_firq_ack),
@@ -249,6 +262,7 @@ Qix_Video video_board (
     .shared_dout     (vid_sh_din),    // video CPU write data → shared RAM port B
     .shared_din      (vid_sh_dout),   // shared RAM port B read → video CPU
     .shared_we       (vid_sh_we),
+    .shared_cs_o     (vid_sh_cs),
 
     .data_firq       (vid_firq_assert),
     .video_firq_ack  (vid_firq_ack),
