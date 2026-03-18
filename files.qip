@@ -20,3 +20,6 @@ set_global_assignment -name VHDL_FILE rtl/cpu/mc6845.vhd
 set_global_assignment -name VHDL_FILE rtl/ram_rom/dpram_dc.vhd
 
 set_global_assignment -name VHDL_FILE rtl/custom/pia6821.vhd
+
+set_global_assignment -name VERILOG_FILE rtl/pll.v
+set_global_assignment -name VERILOG_FILE rtl/pll/pll_0002.v

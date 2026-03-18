@@ -7,7 +7,7 @@
 //           discrete stereo volume attenuator
 //
 // Responsibilities:
-//   - Audio CPU (~0.91 MHz, cpu68 with hold-gated clocking at 20 MHz)
+//   - Clock enable: 921.6 kHz (fractional divider from 20 MHz, matches real hardware)
 //   - Receives sound commands from data CPU via sndPIA1 port A
 //   - 8-bit unsigned DAC via sndPIA1 port B
 //   - Stereo volume scaling from data CPU sndPIA0 port B
@@ -49,21 +49,19 @@ wire        snd_rw;            // 1 = read, 0 = write (active-high read, directl
 wire        snd_vma;           // 1 = valid memory address (active bus cycle)
 wire        snd_wr = ~snd_rw;  // convenience: 1 = write
 
-// ---------------------------------------------------------------------------
-// Clock enable: ~0.91 MHz (20 MHz ÷ 22 = 909 kHz, within 1.6% of 895 kHz target)
-//
-// cpu68 advances state on the falling edge of clk when hold=0.
-// We assert hold on all cycles except one tick per divide period.
-// Pause is applied by forcing hold=1 permanently.
-// ---------------------------------------------------------------------------
-reg [4:0] snd_div;
-always @(posedge clk_20m)
-    if (snd_div == 5'd21) snd_div <= 5'd0;
-    else                  snd_div <= snd_div + 5'd1;
+// Fractional clock enable: 921.6 kHz from 20 MHz (exact average)
+// Real hardware: 7.3728 MHz xtal / 2 = 3.6864 MHz, M6802 internal /4 = 921.6 kHz
+reg [24:0] snd_acc;
+wire snd_cen_raw = (snd_acc >= 25'd20_000_000);
+always @(posedge clk_20m) begin
+    if (snd_cen_raw)
+        snd_acc <= snd_acc - 25'd20_000_000 + 25'd921_600;
+    else
+        snd_acc <= snd_acc + 25'd921_600;
+end
 
-wire snd_cen_raw = (snd_div == 5'd0);
 wire snd_cen     = snd_cen_raw & ~pause;
-wire snd_hold    = ~snd_cen;     // hold CPU except during active tick
+wire snd_hold    = ~snd_cen;
 
 // ---------------------------------------------------------------------------
 // Address decoder — qualified by VMA from cpu68
