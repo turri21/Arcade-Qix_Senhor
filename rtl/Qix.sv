@@ -34,8 +34,6 @@ module Qix (
     input         service3,
     input         service4,
 
-    input  [15:0] dip_sw,
-
     // Video output
     output        video_hsync,
     output        video_vsync,

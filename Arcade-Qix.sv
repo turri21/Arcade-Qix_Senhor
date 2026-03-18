@@ -224,12 +224,9 @@ localparam CONF_STR = {
 	"OB,Flip Vertical,Off,On;",
 	"OFH,Scandoubler Fx,None,HQ2x,CRT 25%,CRT 50%,CRT 75%;",
 	"-;",
-	"H1OR,Autosave Hiscores,Off,On;",
 	"P1,Pause Options;",
 	"P1OP,Pause when OSD is open,On,Off;",
 	"P1OQ,Dim video after 10s,On,Off;",
-	"-;",
-	"DIP;",
 	"-;",
 	"P2,Screen Centering;",
 	"P2O36,H Center,0,-1,-2,-3,-4,-5,-6,-7,+7,+6,+5,+4,+3,+2,+1;",
@@ -274,7 +271,7 @@ hps_io #(.CONF_STR(CONF_STR)) hps_io
 
 	.buttons(buttons),
 	.status(status),
-	.status_menumask({~hs_configured,direct_video}),
+	.status_menumask({direct_video}),
 
 	.ioctl_download(ioctl_download),
 	.ioctl_upload(ioctl_upload),
@@ -392,16 +389,9 @@ pause #(8,8,8,20) pause
 	.*,
 	.clk_sys(CLK_20M),
 	.user_button(m_pause),
-	.pause_request(hs_pause),
+	.pause_request(1'b0),
 	.options(~status[26:25])
 );
-
-// DIP SWITCHES
-reg [7:0] dip_sw[8];	// Active-LOW
-always @(posedge CLK_20M) begin
-	if(ioctl_wr && (ioctl_index==254) && !ioctl_addr[24:3])
-		dip_sw[ioctl_addr[2:0]] <= ioctl_dout;
-end
 
 ///////////////                 Video                  ////////////////
 
@@ -452,8 +442,6 @@ Qix QIX_inst
 	.service3(~m_service3),
 	.service4(~m_service4),
 	
-	.dip_sw({~dip_sw[1], ~dip_sw[0]}),
-
 	.video_hsync(hs),
 	.video_vsync(vs),
 	.video_vblank(vblank),
@@ -472,45 +460,24 @@ Qix QIX_inst
     .ioctl_data(ioctl_dout),
     .ioctl_index(ioctl_index),
 
-	.pause(1'b0), // (pause_cpu),
+	.pause(pause_cpu),
 	.shared_debug_led(shared_debug_led_w),
 
-	.hs_address(hs_address),
-	.hs_data_out(hs_data_out),
-	.hs_data_in(hs_data_in),
-	.hs_write(hs_write_enable)
+	.hs_address(nvram_address),
+	.hs_data_out(nvram_data_out),
+	.hs_data_in(nvram_data_in),
+	.hs_write(nvram_write)
 );
 
-// HISCORE SYSTEM
-// --------------
-wire [15:0]hs_address;
-wire [7:0] hs_data_in;
-wire [7:0] hs_data_out;
-wire hs_write_enable;
-wire hs_access_read;
-wire hs_access_write;
-wire hs_pause;
-wire hs_configured;
+// DIRECT NVRAM LOAD/SAVE
+wire nvram_download = ioctl_download && (ioctl_index == 8'd4);
+wire nvram_upload   = ioctl_upload && (ioctl_index == 8'd4);
+wire [15:0] nvram_address = ioctl_addr[15:0];
+wire [7:0]  nvram_data_in = ioctl_dout;
+wire        nvram_write   = nvram_download && ioctl_wr;
+wire [7:0]  nvram_data_out;
 
-hiscore #(
-	.HS_ADDRESSWIDTH(16),
-	.CFG_ADDRESSWIDTH(3),
-	.CFG_LENGTHWIDTH(2)
-) hi (
-	.*,
-	.clk(CLK_20M),
-	.paused(pause_cpu),
-	.autosave(status[27]),
-	.ram_address(hs_address),
-	.data_from_ram(hs_data_out),
-	.data_to_ram(hs_data_in),
-	.data_from_hps(ioctl_dout),
-	.data_to_hps(ioctl_din),
-	.ram_write(hs_write_enable),
-	.ram_intent_read(hs_access_read),
-	.ram_intent_write(hs_access_write),
-	.pause_cpu(hs_pause),
-	.configured(hs_configured)
-);
+assign ioctl_din = nvram_data_out;
+assign ioctl_upload_req = 0;
 
 endmodule
