@@ -118,14 +118,6 @@ dpram_dc #(.widthad_a(10)) shared_ram_inst (
     .q_b        (vid_sh_dout)
 );
 
-// Debug: light LED when port A reads $02 from shared RAM offset $1F1 ($83F1)
-always @(posedge clk_20m) begin
-    if (reset)
-        shared_debug_led <= 1'b0;
-    else if (vid_sh_we)
-        shared_debug_led <= 1'b1;
-end
-
 // ---------------------------------------------------------------------------
 // ROM ioctl address-range dispatch (concatenated ROM, all ioctl_index == 0)
 //   $00000-$03FFF : Data CPU ROM  (16KB)
@@ -148,21 +140,90 @@ wire cpu_firq_ack;       // data CPU accessed $8C01 (pulse)
 wire vid_firq_assert;    // video CPU accessed $8C00 (pulse)
 wire vid_firq_ack;       // video CPU accessed $8C01 (pulse)
 
+// ---------------------------------------------------------------------------
+// FIRQ delay configuration
+//   MODE 0: No delay (direct latch, current behavior)
+//   MODE 1: Half E-cycle delay (~400ns at 1.25 MHz E clock)
+//   MODE 2: 1 E-cycle delay (~800ns)
+//   MODE 3: 2 E-cycle delay (~1600ns)
+//   MODE 4: Alternating execution (MAME-style interleave)
+// Change this parameter and recompile to test each mode:
+// ---------------------------------------------------------------------------
+localparam FIRQ_DELAY_MODE = 0;  // <-- CHANGE THIS TO TEST: 0,1,2,3,4
+
 reg data_firq_latch;
 reg video_firq_latch;
 
-always @(posedge clk_20m) begin
-    if (reset) begin
-        data_firq_latch  <= 1'b0;
-        video_firq_latch <= 1'b0;
-    end else begin
-        if (cpu_firq_ack)         data_firq_latch <= 1'b0;
-        else if (vid_firq_assert) data_firq_latch <= 1'b1;
+generate
+if (FIRQ_DELAY_MODE == 0) begin : firq_nodelay
+    // --- MODE 0: No delay (current behavior) ---
+    always @(posedge clk_20m) begin
+        if (reset) begin
+            data_firq_latch  <= 1'b0;
+            video_firq_latch <= 1'b0;
+        end else begin
+            if (cpu_firq_ack)         data_firq_latch <= 1'b0;
+            else if (vid_firq_assert) data_firq_latch <= 1'b1;
 
-        if (vid_firq_ack)           video_firq_latch <= 1'b0;
-        else if (cpu_firq_assert)   video_firq_latch <= 1'b1;
+            if (vid_firq_ack)           video_firq_latch <= 1'b0;
+            else if (cpu_firq_assert)   video_firq_latch <= 1'b1;
+        end
+    end
+
+end else if (FIRQ_DELAY_MODE == 4) begin : firq_interleave
+    // --- MODE 4: Alternating execution (MAME-style) ---
+    // Use E clock phase to alternate: data CPU acts on E=1 half,
+    // video CPU acts on E=0 half. FIRQ only asserts when target
+    // CPU's phase is active, guaranteeing shared RAM write has settled.
+    always @(posedge clk_20m) begin
+        if (reset) begin
+            data_firq_latch  <= 1'b0;
+            video_firq_latch <= 1'b0;
+        end else begin
+            if (cpu_firq_ack)
+                data_firq_latch <= 1'b0;
+            else if (vid_firq_assert && cpu_E)
+                data_firq_latch <= 1'b1;
+
+            if (vid_firq_ack)
+                video_firq_latch <= 1'b0;
+            else if (cpu_firq_assert && ~cpu_E)
+                video_firq_latch <= 1'b1;
+        end
+    end
+
+end else begin : firq_delayed
+    // --- MODES 1-3: Delayed FIRQ assertion ---
+    // Shift register delays the assert pulse by N E-half-cycles
+    localparam DELAY_TAPS = (FIRQ_DELAY_MODE == 1) ? 8 :   // half E-cycle (~8 clk_20m ticks)
+                            (FIRQ_DELAY_MODE == 2) ? 16 :  // 1 E-cycle (~16 clk_20m ticks)
+                                                     32;   // 2 E-cycles (~32 clk_20m ticks)
+
+    reg [31:0] vid_assert_sr;
+    reg [31:0] cpu_assert_sr;
+
+    wire vid_assert_delayed = vid_assert_sr[DELAY_TAPS-1];
+    wire cpu_assert_delayed = cpu_assert_sr[DELAY_TAPS-1];
+
+    always @(posedge clk_20m) begin
+        if (reset) begin
+            vid_assert_sr <= 32'd0;
+            cpu_assert_sr <= 32'd0;
+            data_firq_latch  <= 1'b0;
+            video_firq_latch <= 1'b0;
+        end else begin
+            vid_assert_sr <= {vid_assert_sr[30:0], vid_firq_assert};
+            cpu_assert_sr <= {cpu_assert_sr[30:0], cpu_firq_assert};
+
+            if (cpu_firq_ack)           data_firq_latch <= 1'b0;
+            else if (vid_assert_delayed) data_firq_latch <= 1'b1;
+
+            if (vid_firq_ack)             video_firq_latch <= 1'b0;
+            else if (cpu_assert_delayed)  video_firq_latch <= 1'b1;
+        end
     end
 end
+endgenerate
 
 wire data_firq_n  = ~data_firq_latch;
 wire video_firq_n = ~video_firq_latch;
