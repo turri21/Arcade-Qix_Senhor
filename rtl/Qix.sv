@@ -149,7 +149,7 @@ wire vid_firq_ack;       // video CPU accessed $8C01 (pulse)
 //   MODE 4: Alternating execution (MAME-style interleave)
 // Change this parameter and recompile to test each mode:
 // ---------------------------------------------------------------------------
-localparam FIRQ_DELAY_MODE = 0;  // <-- CHANGE THIS TO TEST: 0,1,2,3,4
+localparam FIRQ_DELAY_MODE = 5;  // <-- CHANGE THIS TO TEST: 0,1,2,3,4
 
 reg data_firq_latch;
 reg video_firq_latch;
@@ -167,6 +167,40 @@ if (FIRQ_DELAY_MODE == 0) begin : firq_nodelay
 
             if (vid_firq_ack)           video_firq_latch <= 1'b0;
             else if (cpu_firq_assert)   video_firq_latch <= 1'b1;
+        end
+    end
+
+end else if (FIRQ_DELAY_MODE == 5) begin : firq_mame_scanline
+    // --- MODE 5: MAME-style end-of-phase FIRQs ---
+    reg data_firq_pending;
+    reg video_firq_pending;
+
+    always @(posedge clk_20m) begin
+        if (reset) begin
+            data_firq_pending  <= 1'b0;
+            video_firq_pending <= 1'b0;
+            data_firq_latch    <= 1'b0;
+            video_firq_latch   <= 1'b0;
+        end else begin
+            // --- Data CPU ---
+            if (vid_firq_assert)
+                data_firq_pending <= 1'b1;
+            if (cpu_E && data_firq_pending) begin
+                data_firq_latch  <= 1'b1;
+                data_firq_pending <= 1'b0;
+            end
+            if (cpu_firq_ack)
+                data_firq_latch <= 1'b0;
+
+            // --- Video CPU ---
+            if (cpu_firq_assert)
+                video_firq_pending <= 1'b1;
+            if (~cpu_E && video_firq_pending) begin
+                video_firq_latch   <= 1'b1;
+                video_firq_pending <= 1'b0;
+            end
+            if (vid_firq_ack)
+                video_firq_latch <= 1'b0;
         end
     end
 
