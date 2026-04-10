@@ -126,14 +126,16 @@ dpram_dc #(.widthad_a(10)) shared_ram_inst (
 
 // ---------------------------------------------------------------------------
 // ROM ioctl address-range dispatch (concatenated ROM, all ioctl_index == 0)
-//   $00000-$03FFF : Data CPU ROM  (16KB)
-//   $04000-$07FFF : Video CPU ROM (16KB)
-//   $08000-$087FF : Audio CPU ROM  (2KB)
+//
+// MRA layout (Qix set 2 example, all sets follow same slot structure):
+//   $00000-$05FFF : data CPU  (24KB, 6× $1000 slots covering $A000-$FFFF)
+//   $06000-$0BFFF : video CPU (24KB, 6× $1000 slots covering $A000-$FFFF)
+//   $0C000-$0EFFF : audio CPU (12KB, covers $D000-$FFFF platform max)
+//                  Qix: qq27.u27 is 2KB at $F800, padded to land at $0E800
 // ---------------------------------------------------------------------------
 wire cpu_ioctl_wr = ioctl_wr & (ioctl_addr < 25'h06000);                             // 24KB
 wire vid_ioctl_wr = ioctl_wr & (ioctl_addr >= 25'h06000) & (ioctl_addr < 25'h0C000); // 24KB
-wire snd_ioctl_wr = ioctl_wr & (ioctl_addr >= 25'h0C000) & (ioctl_addr < 25'h0F000); // 12KB
-
+wire snd_ioctl_wr = ioctl_wr & (ioctl_addr >= 25'h0C000) & (ioctl_addr < 25'h0F000); // 12KB ($D000-$FFFF)
 // ---------------------------------------------------------------------------
 // FIRQ cross-signals (from schematic Figure 13, U7 7474 dual flip-flop)
 //
@@ -274,11 +276,12 @@ wire crtc_vsync_out;
 // Sound PIA signal routing
 //   sndPIA0 lives in Qix_CPU; sndPIA1 lives in Qix_Sound.
 // ---------------------------------------------------------------------------
-wire [7:0] snd_cmd;          // Qix_CPU sndPIA0 PA out → Qix_Sound sndPIA1 PA in
-wire [7:0] snd_vol;          // Qix_CPU sndPIA0 PB out → Qix_Sound vol_data
-wire        snd_irq_cpu2snd;  // Qix_CPU sndPIA0 CA2 → Qix_Sound sndPIA1 CA1
-wire        snd_irq_snd2cpu;  // Qix_Sound sndPIA1 CA2 → Qix_CPU sndPIA0 CA1
-wire        flip;             // Qix_CPU sndPIA0 CB2 → Qix_Video flip
+wire [7:0] snd_cmd;              // Qix_CPU sndPIA0 PA out → Qix_Sound sndPIA1 PA in
+wire [7:0] snd_cmd_from_snd;     // Qix_Sound sndPIA1 PA out → Qix_CPU sndPIA0 PA in
+wire [7:0] snd_vol;              // Qix_CPU sndPIA0 PB out → Qix_Sound vol_data
+wire        snd_irq_cpu2snd;     // Qix_CPU sndPIA0 CA2 → Qix_Sound sndPIA1 CA1
+wire        snd_irq_snd2cpu;     // Qix_Sound sndPIA1 CA2 → Qix_CPU sndPIA0 CA1
+wire        flip;                // Qix_CPU sndPIA0 CB2 → Qix_Video flip
 
 // ---------------------------------------------------------------------------
 // PIA input assembly — EXACT match to schematic Figure 16
@@ -287,13 +290,14 @@ wire        flip;             // Qix_CPU sndPIA0 CB2 → Qix_Video flip
 // PIA0 port B (U11 PB): [7]=Tilt [6]=Coin3 [5]=Coin2 [4]=Coin1 [3:0]={svc4,svc3,svc2,svc1}
 // PIA2 port A (U30 PA): [7]=Fire2 [6:4]=Spare [3:0]={R,L,D,U}
 // ---------------------------------------------------------------------------
-wire [7:0] p1_pia   = {p1_btn1, start_buttons[0], start_buttons[1], p1_btn2,
-                        p1_joystick[0], p1_joystick[1], p1_joystick[2], p1_joystick[3]};  // R,L,D,U order
 
 wire [7:0] coin_pia = {1'b1, 1'b1, coin[1], coin[0], service4, service3, service2, service};
 
+wire [7:0] p1_pia   = {p1_btn1, start_buttons[0], start_buttons[1], p1_btn2,
+                        p1_joystick[2], p1_joystick[1], p1_joystick[3], p1_joystick[0]};  // L,D,R,U → PIA [3:0]
+
 wire [7:0] p2_pia   = {p2_btn1, 3'b111,
-                        p2_joystick[0], p2_joystick[1], p2_joystick[2], p2_joystick[3]};  // R,L,D,U order
+                        p2_joystick[2], p2_joystick[1], p2_joystick[3], p2_joystick[0]};  // same
 
 // ---------------------------------------------------------------------------
 // Qix_CPU — data CPU board
@@ -323,6 +327,7 @@ Qix_CPU cpu_board (
     .crtc_vsync      (crtc_vsync_out),
 
     .snd_data_out    (snd_cmd),
+    .snd_data_in     (snd_cmd_from_snd),
     .snd_vol_out     (snd_vol),
     .snd_irq_to_snd  (snd_irq_cpu2snd),
     .snd_irq_from_snd(snd_irq_snd2cpu),
@@ -387,7 +392,7 @@ Qix_Sound sound_board (
     .reset            (reset),
 
     .snd_data_in      (snd_cmd),
-    .snd_data_out     (),            // sound→data path unused (sndPIA0 pa_i = 8'h00)
+    .snd_data_out     (snd_cmd_from_snd), // sound→data CPU reply path
     .snd_irq_from_cpu (snd_irq_cpu2snd),
     .snd_irq_to_cpu   (snd_irq_snd2cpu),
 

@@ -70,10 +70,12 @@ wire sndpia2_cs_addr = (snd_A[15:13] == 3'b001);   // $2000-$3FFF
 wire sndpia1_cs_addr = (snd_A[15:14] == 2'b01);    // $4000-$7FFF
 wire rom_cs          = (snd_A >= 16'hD000);        // $D000-$FFFF (12KB)
 
-// PIA enables: active during valid bus cycles at the active CPU tick
-// cpu68 drives vma=1 when the bus cycle is real (not idle/dead cycle)
-wire sndpia2_en = snd_cen & snd_vma & sndpia2_cs_addr;
-wire sndpia1_en = snd_cen & snd_vma & sndpia1_cs_addr;
+// PIA enables: qualified by VMA only. The PIA write process clocks on the
+// rising edge (clk='1') while cpu68 advances on the falling edge (clk='0'),
+// so the PIA naturally samples cs mid-cycle. Adding snd_cen here would
+// mis-time the cs pulse relative to when the CPU address bus is valid.
+wire sndpia2_en = snd_vma & sndpia2_cs_addr;
+wire sndpia1_en = snd_vma & sndpia1_cs_addr;
 
 // ---------------------------------------------------------------------------
 // 6802 internal RAM — 128 bytes ($0000-$007F)
@@ -84,7 +86,7 @@ wire internal_ram_cs   = (snd_A[15:7] == 9'd0);    // $0000-$007F
 wire [7:0] internal_ram_dout = internal_ram[snd_A[6:0]];
 
 always @(posedge clk_20m)
-    if (snd_cen && snd_vma && snd_wr && internal_ram_cs)
+    if (snd_vma && snd_wr && internal_ram_cs)
         internal_ram[snd_A[6:0]] <= snd_Dout;
 
 // ---------------------------------------------------------------------------

@@ -40,6 +40,7 @@ module Qix_CPU (
 
     // Sound PIA interface (to/from Qix_Sound)
     output [7:0]  snd_data_out,   // sndPIA0 port A output → sound CPU
+    input  [7:0]  snd_data_in,    // sndPIA0 port A input ← sound CPU reply
     output [7:0]  snd_vol_out,    // sndPIA0 port B output → stereo volume
     output        snd_irq_to_snd, // CA2 → sound CPU interrupt
     input         snd_irq_from_snd,// CA1 ← sound CPU interrupt
@@ -187,7 +188,7 @@ pia6821 sndpia0 (
     .data_out (sndpia_dout),
     .irqa     (sndpia_irqa),
     .irqb     (sndpia_irqb),
-    .pa_i     (8'h00),
+    .pa_i     (snd_data_in),
     .pa_o     (sndpia_pa_o),
     .pa_oe    (sndpia_pa_oe),
     .ca1      (snd_irq_from_snd),
