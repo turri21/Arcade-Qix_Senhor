@@ -64,9 +64,9 @@ reg [24:0] snd_acc;
 wire snd_cen_raw = (snd_acc >= 25'd20_000_000);
 always @(posedge clk_20m) begin
     if (snd_cen_raw)
-        snd_acc <= snd_acc - 25'd20_000_000 + 25'd921_600;
+        snd_acc <= snd_acc - 25'd20_000_000 + 25'd3_686_400;
     else
-        snd_acc <= snd_acc + 25'd921_600;
+        snd_acc <= snd_acc + 25'd3_686_400;
 end
 
 wire snd_cen = snd_cen_raw & ~pause;
@@ -299,11 +299,11 @@ wire signed [8:0]  dac_centered  = $signed({1'b0, dac_val}) - 9'sh80;
 wire signed [17:0] dac_l_scaled  = dac_centered * $signed({2'b0, vol_l});
 wire signed [17:0] dac_r_scaled  = dac_centered * $signed({2'b0, vol_r});
 
-// assign audio_l = dac_l_scaled[16:1];
-// assign audio_r = dac_r_scaled[16:1];
+assign audio_l = dac_l_scaled[16:1];
+assign audio_r = dac_r_scaled[16:1];
 
-assign audio_l = dac_l_scaled[17:2];
-assign audio_r = dac_r_scaled[17:2];
+// assign audio_l = dac_l_scaled[17:2];
+// assign audio_r = dac_r_scaled[17:2];
 
 
 endmodule
