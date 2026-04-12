@@ -45,9 +45,8 @@ module Qix_Sound (
 wire [15:0] snd_A;
 wire [7:0]  snd_Dout;
 wire [7:0]  snd_Din;           // assigned at bottom by read mux
-wire        snd_rw;            // 1 = read, 0 = write (active-high read, directly from cpu68)
-wire        snd_vma;           // 1 = valid memory address (active bus cycle)
-wire        snd_wr = ~snd_rw;  // convenience: 1 = write
+wire        snd_rw;            // 1 = read, 0 = write (kept for PIA compatibility)
+wire        snd_wr;            // active-high write strobe from jt680x
 
 // One-shot power-on reset for cpu68. Fires once at startup to ensure
 // the CPU fetches the reset vector. Uses a 2-bit counter with explicit
@@ -70,8 +69,9 @@ always @(posedge clk_20m) begin
         snd_acc <= snd_acc + 25'd921_600;
 end
 
-wire snd_cen     = snd_cen_raw & ~pause;
-wire snd_hold    = ~snd_cen;
+wire snd_cen = snd_cen_raw & ~pause;
+reg snd_cen_d;
+always @(posedge clk_20m) snd_cen_d <= snd_cen;
 
 // ---------------------------------------------------------------------------
 // Address decoder — qualified by VMA from cpu68
@@ -90,8 +90,8 @@ wire rom_cs          = (snd_A >= 16'hD000);        // $D000-$FFFF (12KB)
 reg snd_cen_negedge;
 always @(negedge clk_20m) snd_cen_negedge <= snd_cen;
 
-wire sndpia2_en = snd_cen_negedge & snd_vma & sndpia2_cs_addr;
-wire sndpia1_en = snd_cen_negedge & snd_vma & sndpia1_cs_addr;
+wire sndpia2_en = snd_cen & sndpia2_cs_addr;
+wire sndpia1_en = snd_cen & sndpia1_cs_addr;
 
 // ---------------------------------------------------------------------------
 // 6802 internal RAM — 128 bytes ($0000-$007F)
@@ -102,43 +102,46 @@ wire internal_ram_cs   = (snd_A[15:7] == 9'd0);    // $0000-$007F
 //wire [7:0] internal_ram_dout = internal_ram[snd_A[6:0]];
 
 reg [7:0] internal_ram_dout;
-always @(negedge clk_20m)
-    if (snd_vma && internal_ram_cs)
+always @(posedge clk_20m)
+    if (snd_cen_d && internal_ram_cs)
         internal_ram_dout <= internal_ram[snd_A[6:0]];
 
 always @(posedge clk_20m)
-    if (snd_vma && snd_wr && internal_ram_cs)
+    if (snd_cen && snd_wr && internal_ram_cs)
         internal_ram[snd_A[6:0]] <= snd_Dout;
 
 // ---------------------------------------------------------------------------
-// cpu68 — MC6800/6802 compatible audio CPU (John Kent, OpenCores)
+// jt680x — MC6802 compatible audio CPU (jotego, posedge-clocked with cen)
 //   rst      : active-high synchronous reset
-//   hold     : active-high, freezes state machine (used for clock gating)
-//   halt     : active-high, halts CPU at next fetch (active high)
+//   cen      : clock enable (advances CPU one cycle when high)
+//   wr       : active-high write strobe
+//   addr     : 16-bit address bus (always valid)
 //   irq      : active-high IRQ
 //   nmi      : active-high NMI — tie low (not used by Qix)
-//   rw       : active-high read (directly drives PIAs)
-//   vma      : valid memory address — 1 when bus cycle is real
-//
-// NOTE: cpu68 advances on the FALLING edge of clk.
-//       hold=1 freezes it. We gate hold to get ~909 kHz effective rate.
+//   ext_halt : 6301 bus sharing — tie low
+//   irq_icf/ocf/tof/sci/cmf/irq2 : 6801/6301-specific — tie low for 6802
 // ---------------------------------------------------------------------------
 wire snd_irq;
+assign snd_rw = ~snd_wr;  // keep snd_rw for PIA compatibility
 
-cpu68 audio_cpu (
-    .clk      (clk_20m),
-    .rst      (snd_rst),
-    .rw       (snd_rw),
-    .vma      (snd_vma),
-    .address  (snd_A),
-    .data_in  (snd_Din),
-    .data_out (snd_Dout),
-    .hold     (snd_hold),
-    .halt     (1'b0),
-    .irq      (snd_irq),
-    .nmi      (1'b0),
-    .test_alu (),
-    .test_cc  ()
+jt680x audio_cpu (
+    .rst        (snd_rst),
+    .clk        (clk_20m),
+    .cen        (snd_cen),
+    .wr         (snd_wr),
+    .addr       (snd_A),
+    .din        (snd_Din),
+    .dout       (snd_Dout),
+    .ext_halt   (1'b0),
+    .ba         (),
+    .irq        (snd_irq),
+    .nmi        (1'b0),
+    .irq_icf    (1'b0),
+    .irq_ocf    (1'b0),
+    .irq_tof    (1'b0),
+    .irq_sci    (1'b0),
+    .irq_cmf    (1'b0),
+    .irq2       (1'b0)
 );
 
 // ---------------------------------------------------------------------------
@@ -237,14 +240,11 @@ wire [13:0] rom_ioctl_addr = ioctl_addr[13:0];
 //    rom_dout <= snd_rom[rom_cpu_addr];
 //end
 
-// ROM write (ioctl) — posedge
+// ROM read/write — posedge; ioctl_wr takes priority, else CPU read (no VMA needed with jt680x)
 always @(posedge clk_20m)
     if (ioctl_wr)
         snd_rom[rom_ioctl_addr] <= ioctl_data;
-
-// ROM read — negedge to match cpu68 falling-edge timing
-always @(negedge clk_20m)
-    if (snd_vma && rom_cs)
+    else if (snd_cen_d && rom_cs)
         rom_dout <= snd_rom[rom_cpu_addr];
 
 // ---------------------------------------------------------------------------
@@ -255,14 +255,13 @@ always @(negedge clk_20m)
 
 reg [7:0] sndpia1_dout_r;
 always @(posedge clk_20m)
-    if (snd_vma && sndpia1_cs_addr)
+    if (snd_cen && sndpia1_cs_addr)
         sndpia1_dout_r <= sndpia1_dout;
 
 assign snd_Din =
     internal_ram_cs ? internal_ram_dout :
     sndpia2_cs_addr ? sndpia2_dout      :
-//    sndpia1_cs_addr ? sndpia1_dout      :
-    sndpia1_cs_addr ? sndpia1_dout_r    :
+    sndpia1_cs_addr ? sndpia1_dout      :
 
     rom_cs          ? rom_dout          :
     8'hFF;

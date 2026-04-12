@@ -24,5 +24,10 @@ set_global_assignment -name VHDL_FILE rtl/ram_rom/dpram_dc.vhd
 
 set_global_assignment -name VHDL_FILE rtl/custom/pia6821.vhd
 
+set_global_assignment -name VERILOG_FILE rtl/sound/jt680x/hdl/jt680x.v
+set_global_assignment -name VERILOG_FILE rtl/sound/jt680x/hdl/jt680x_ctrl.v
+set_global_assignment -name VERILOG_FILE rtl/sound/jt680x/hdl/jt680x_alu.v
+set_global_assignment -name VERILOG_FILE rtl/sound/jt680x/hdl/jt680x_regs.v
+
 set_global_assignment -name VERILOG_FILE rtl/pll.v
 set_global_assignment -name VERILOG_FILE rtl/pll/pll_0002.v
