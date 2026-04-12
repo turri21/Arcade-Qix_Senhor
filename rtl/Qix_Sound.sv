@@ -55,7 +55,8 @@ wire        snd_wr = ~snd_rw;  // convenience: 1 = write
 // ALLOW_POWER_UP_DONT_CARE when they are part of active logic.
 reg [1:0] snd_por = 2'b11;
 always @(posedge clk_20m)
-    if (snd_por != 2'b00) snd_por <= snd_por - 2'd1;
+    if (reset)           snd_por <= 2'b11;
+    else if (snd_por != 2'b00) snd_por <= snd_por - 2'd1;
 wire snd_rst = (snd_por != 2'b00);
 
 // Fractional clock enable: 921.6 kHz from 20 MHz (exact average)
@@ -98,7 +99,12 @@ wire sndpia1_en = snd_cen_negedge & snd_vma & sndpia1_cs_addr;
 // ---------------------------------------------------------------------------
 reg [7:0] internal_ram [0:127];
 wire internal_ram_cs   = (snd_A[15:7] == 9'd0);    // $0000-$007F
-wire [7:0] internal_ram_dout = internal_ram[snd_A[6:0]];
+//wire [7:0] internal_ram_dout = internal_ram[snd_A[6:0]];
+
+reg [7:0] internal_ram_dout;
+always @(negedge clk_20m)
+    if (snd_vma && internal_ram_cs)
+        internal_ram_dout <= internal_ram[snd_A[6:0]];
 
 always @(posedge clk_20m)
     if (snd_vma && snd_wr && internal_ram_cs)
@@ -149,7 +155,7 @@ wire       sndpia1_ca2_o, sndpia1_ca2_oe;
 wire       sndpia1_cb2_o, sndpia1_cb2_oe;
 wire       sndpia1_irqa,  sndpia1_irqb;
 
-pia6821 sndpia1 (
+pia6821_sv sndpia1 (
     .clk      (clk_20m),
     .rst      (snd_rst),
     .cs       (sndpia1_en),
@@ -184,7 +190,7 @@ assign snd_irq_to_cpu = sndpia1_ca2_o;
 wire [7:0] sndpia2_dout;
 wire       sndpia2_irqa, sndpia2_irqb;
 
-pia6821 sndpia2 (
+pia6821_sv sndpia2 (
     .clk      (clk_20m),
     .rst      (snd_rst),
     .cs       (sndpia2_en),
@@ -225,21 +231,39 @@ reg [7:0] rom_dout;
 wire [13:0] rom_cpu_addr   = snd_A[13:0] - 14'h1000;  // $D000→0
 wire [13:0] rom_ioctl_addr = ioctl_addr[13:0];
 
-always @(posedge clk_20m) begin
+//always @(posedge clk_20m) begin
+//    if (ioctl_wr)
+//        snd_rom[rom_ioctl_addr] <= ioctl_data;
+//    rom_dout <= snd_rom[rom_cpu_addr];
+//end
+
+// ROM write (ioctl) — posedge
+always @(posedge clk_20m)
     if (ioctl_wr)
         snd_rom[rom_ioctl_addr] <= ioctl_data;
-    rom_dout <= snd_rom[rom_cpu_addr];
-end
+
+// ROM read — negedge to match cpu68 falling-edge timing
+always @(negedge clk_20m)
+    if (snd_vma && rom_cs)
+        rom_dout <= snd_rom[rom_cpu_addr];
 
 // ---------------------------------------------------------------------------
 // CPU data bus read mux — default $FF for unmapped regions
 // Internal 6802 RAM ($0000-$007F) handled externally since cpu68 has no
 // built-in RAM (unlike the real MC6802 silicon).
 // ---------------------------------------------------------------------------
+
+reg [7:0] sndpia1_dout_r;
+always @(posedge clk_20m)
+    if (snd_vma && sndpia1_cs_addr)
+        sndpia1_dout_r <= sndpia1_dout;
+
 assign snd_Din =
     internal_ram_cs ? internal_ram_dout :
     sndpia2_cs_addr ? sndpia2_dout      :
-    sndpia1_cs_addr ? sndpia1_dout      :
+//    sndpia1_cs_addr ? sndpia1_dout      :
+    sndpia1_cs_addr ? sndpia1_dout_r    :
+
     rom_cs          ? rom_dout          :
     8'hFF;
 
@@ -276,7 +300,11 @@ wire signed [8:0]  dac_centered  = $signed({1'b0, dac_val}) - 9'sh80;
 wire signed [17:0] dac_l_scaled  = dac_centered * $signed({2'b0, vol_l});
 wire signed [17:0] dac_r_scaled  = dac_centered * $signed({2'b0, vol_r});
 
-assign audio_l = dac_l_scaled[16:1];
-assign audio_r = dac_r_scaled[16:1];
+// assign audio_l = dac_l_scaled[16:1];
+// assign audio_r = dac_r_scaled[16:1];
+
+assign audio_l = dac_l_scaled[17:2];
+assign audio_r = dac_r_scaled[17:2];
+
 
 endmodule

@@ -1,0 +1,1383 @@
+F920: 0F       sei  
+F921: 8E 00 7F lds  #$007F
+F924: 30       tsx  
+F925: 6F 00    clr  $00,x
+F927: 09       dex  
+F928: 8C FF FF cmpx #$FFFF
+F92B: 26 F8    bne  $F925
+F92D: CE 40 00 ldx  #$4000
+F930: 6F 01    clr  $01,x
+F932: 6F 03    clr  $03,x
+F934: 86 FF    lda  #$FF
+F936: 6F 00    clr  $00,x
+F938: A7 02    sta  $02,x
+F93A: 86 07    lda  #$07
+F93C: A7 01    sta  $01,x
+F93E: 4A       deca 
+F93F: A7 03    sta  $03,x
+F941: 97 1C    sta  $1C
+F943: 0E       cli  
+F944: 20 FE    bra  $F944
+F946: CE F9 20 ldx  #$F920
+F949: DF 24    stx  $24
+F94B: 96 20    lda  $20
+F94D: 97 1E    sta  $1E
+F94F: 96 21    lda  $21
+F951: 97 1F    sta  $1F
+F953: C6 10    ldb  #$10
+F955: A6 00    lda  $00,x
+F957: B7 40 02 sta  $4002
+F95A: 08       inx  
+F95B: 96 1E    lda  $1E
+F95D: 4A       deca 
+F95E: 26 FD    bne  $F95D
+F960: 5A       decb 
+F961: 26 21    bne  $F984
+F963: 7A 00 1F dec  $001F
+F966: 26 0C    bne  $F974
+F968: 8C FA 80 cmpx #$FA80
+F96B: 26 11    bne  $F97E
+F96D: CE F9 20 ldx  #$F920
+F970: DF 24    stx  $24
+F972: 20 DB    bra  $F94F
+F974: DE 24    ldx  $24
+F976: 20 00    bra  $F978
+F978: 20 00    bra  $F97A
+F97A: 20 00    bra  $F97C
+F97C: 20 D5    bra  $F953
+F97E: DF 24    stx  $24
+F980: DE 24    ldx  $24
+F982: 20 CB    bra  $F94F
+F984: 6D 00    tst  $00,x
+F986: 6D 00    tst  $00,x
+F988: 6D 00    tst  $00,x
+F98A: 6D 00    tst  $00,x
+F98C: 7D 00 24 tst  $0024
+F98F: 20 00    bra  $F991
+F991: 20 C2    bra  $F955
+F993: CE F8 FF ldx  #$F8FF
+F996: DF 24    stx  $24
+F998: 86 18    lda  #$18
+F99A: 97 1E    sta  $1E
+F99C: 86 10    lda  #$10
+F99E: 97 1F    sta  $1F
+F9A0: C6 10    ldb  #$10
+F9A2: A6 00    lda  $00,x
+F9A4: B7 40 02 sta  $4002
+F9A7: 08       inx  
+F9A8: 96 1E    lda  $1E
+F9AA: 4A       deca 
+F9AB: 26 FD    bne  $F9AA
+F9AD: 5A       decb 
+F9AE: 26 1A    bne  $F9CA
+F9B0: 7A 00 1F dec  $001F
+F9B3: 26 0A    bne  $F9BF
+F9B5: 96 25    lda  $25
+F9B7: 8B F8    adda #$F8
+F9B9: 97 25    sta  $25
+F9BB: DE 24    ldx  $24
+F9BD: 20 DD    bra  $F99C
+F9BF: DE 24    ldx  $24
+F9C1: DF 24    stx  $24
+F9C3: 01       nop  
+F9C4: 20 00    bra  $F9C6
+F9C6: 20 00    bra  $F9C8
+F9C8: 20 D6    bra  $F9A0
+F9CA: 6D 00    tst  $00,x
+F9CC: 6D 00    tst  $00,x
+F9CE: 6D 00    tst  $00,x
+F9D0: 6D 00    tst  $00,x
+F9D2: 20 00    bra  $F9D4
+F9D4: 20 CC    bra  $F9A2
+F9D6: CE F8 00 ldx  #$F800
+F9D9: DF 24    stx  $24
+F9DB: 96 20    lda  $20
+F9DD: 97 1E    sta  $1E
+F9DF: 96 21    lda  $21
+F9E1: 97 1F    sta  $1F
+F9E3: C6 10    ldb  #$10
+F9E5: A6 00    lda  $00,x
+F9E7: B7 40 02 sta  $4002
+F9EA: 08       inx  
+F9EB: 96 1E    lda  $1E
+F9ED: 4A       deca 
+F9EE: 26 FD    bne  $F9ED
+F9F0: 5A       decb 
+F9F1: 26 1E    bne  $FA11
+F9F3: 7A 00 1F dec  $001F
+F9F6: 26 0B    bne  $FA03
+F9F8: 8C F9 20 cmpx #$F920
+F9FB: 27 0B    beq  $FA08
+F9FD: DF 24    stx  $24
+F9FF: DE 24    ldx  $24
+FA01: 20 DC    bra  $F9DF
+FA03: 8C F9 20 cmpx #$F920
+FA06: 20 00    bra  $FA08
+FA08: DE 24    ldx  $24
+FA0A: DF 24    stx  $24
+FA0C: 01       nop  
+FA0D: 20 00    bra  $FA0F
+FA0F: 20 D2    bra  $F9E3
+FA11: 6D 00    tst  $00,x
+FA13: 6D 00    tst  $00,x
+FA15: 6D 00    tst  $00,x
+FA17: 6D 00    tst  $00,x
+FA19: 6D 00    tst  $00,x
+FA1B: 20 C8    bra  $F9E5
+FA1D: 96 1C    lda  $1C
+FA1F: 44       lsra 
+FA20: 44       lsra 
+FA21: 44       lsra 
+FA22: 98 1C    eora $1C
+FA24: 44       lsra 
+FA25: 76 00 1D ror  $001D
+FA28: 76 00 1C ror  $001C
+FA2B: 24 07    bcc  $FA34
+FA2D: 86 00    lda  #$00
+FA2F: B7 40 02 sta  $4002
+FA32: 20 E9    bra  $FA1D
+FA34: 86 FF    lda  #$FF
+FA36: B7 40 02 sta  $4002
+FA39: 20 E2    bra  $FA1D
+FA3B: C6 01    ldb  #$01
+FA3D: 86 10    lda  #$10
+FA3F: 97 20    sta  $20
+FA41: 96 1C    lda  $1C
+FA43: 44       lsra 
+FA44: 44       lsra 
+FA45: 44       lsra 
+FA46: 98 1C    eora $1C
+FA48: 44       lsra 
+FA49: 76 00 1D ror  $001D
+FA4C: 76 00 1C ror  $001C
+FA4F: 25 13    bcs  $FA64
+FA51: 86 60    lda  #$60
+FA53: B7 40 02 sta  $4002
+FA56: 17       tba  
+FA57: 4A       deca 
+FA58: 26 FD    bne  $FA57
+FA5A: 7A 00 20 dec  $0020
+FA5D: 26 E2    bne  $FA41
+FA5F: 5C       incb 
+FA60: 26 DB    bne  $FA3D
+FA62: 20 11    bra  $FA75
+FA64: 86 A0    lda  #$A0
+FA66: B7 40 02 sta  $4002
+FA69: 17       tba  
+FA6A: 4A       deca 
+FA6B: 26 FD    bne  $FA6A
+FA6D: 7A 00 20 dec  $0020
+FA70: 26 CF    bne  $FA41
+FA72: 5C       incb 
+FA73: 26 C8    bne  $FA3D
+FA75: 20 FE    bra  $FA75
+FA77: 86 F8    lda  #$F8
+FA79: 97 26    sta  $26
+FA7B: 5F       clrb 
+FA7C: 5C       incb 
+FA7D: C4 0F    andb #$0F
+FA7F: D7 27    stb  $27
+FA81: DE 26    ldx  $26
+FA83: A6 00    lda  $00,x
+FA85: B7 40 02 sta  $4002
+FA88: 96 1E    lda  $1E
+FA8A: 4A       deca 
+FA8B: 26 FD    bne  $FA8A
+FA8D: 20 ED    bra  $FA7C
+FA8F: 86 F8    lda  #$F8
+FA91: 97 26    sta  $26
+FA93: 86 70    lda  #$70
+FA95: 97 1E    sta  $1E
+FA97: B6 40 00 lda  $4000
+FA9A: 97 27    sta  $27
+FA9C: C6 10    ldb  #$10
+FA9E: DE 26    ldx  $26
+FAA0: A6 00    lda  $00,x
+FAA2: B7 40 02 sta  $4002
+FAA5: 96 1E    lda  $1E
+FAA7: 4A       deca 
+FAA8: 26 FD    bne  $FAA7
+FAAA: 08       inx  
+FAAB: 5A       decb 
+FAAC: 27 E9    beq  $FA97
+FAAE: 96 26    lda  $26
+FAB0: 20 00    bra  $FAB2
+FAB2: 20 00    bra  $FAB4
+FAB4: 20 EA    bra  $FAA0
+FAB6: DF 24    stx  $24
+FAB8: CE FB A0 ldx  #$FBA0
+FABB: DF 28    stx  $28
+FABD: 86 80    lda  #$80
+FABF: D6 03    ldb  $03
+FAC1: 2A 09    bpl  $FACC
+FAC3: D6 1C    ldb  $1C
+FAC5: 54       lsrb 
+FAC6: 54       lsrb 
+FAC7: 54       lsrb 
+FAC8: 5C       incb 
+FAC9: 5A       decb 
+FACA: 26 FD    bne  $FAC9
+FACC: 7A 00 08 dec  $0008
+FACF: 27 4C    beq  $FB1D
+FAD1: 7A 00 09 dec  $0009
+FAD4: 27 4C    beq  $FB22
+FAD6: 7A 00 0A dec  $000A
+FAD9: 27 4C    beq  $FB27
+FADB: 7A 00 0B dec  $000B
+FADE: 26 DF    bne  $FABF
+FAE0: D6 03    ldb  $03
+FAE2: 27 DB    beq  $FABF
+FAE4: C4 7F    andb #$7F
+FAE6: D7 0B    stb  $0B
+FAE8: D6 1C    ldb  $1C
+FAEA: 58       aslb 
+FAEB: DB 1C    addb $1C
+FAED: CB 0B    addb #$0B
+FAEF: D7 1C    stb  $1C
+FAF1: 7A 00 1B dec  $001B
+FAF4: 26 0E    bne  $FB04
+FAF6: D6 0F    ldb  $0F
+FAF8: D7 1B    stb  $1B
+FAFA: DE 28    ldx  $28
+FAFC: 09       dex  
+FAFD: 8C FB 99 cmpx #$FB99
+FB00: 27 4E    beq  $FB50
+FB02: DF 28    stx  $28
+FB04: D6 1C    ldb  $1C
+FB06: 2B 06    bmi  $FB0E
+FB08: D4 07    andb $07
+FB0A: C4 7F    andb #$7F
+FB0C: 20 05    bra  $FB13
+FB0E: D4 07    andb $07
+FB10: C4 7F    andb #$7F
+FB12: 50       negb 
+FB13: 36       psha 
+FB14: 1B       aba  
+FB15: 16       tab  
+FB16: 32       pula 
+FB17: DE 28    ldx  $28
+FB19: AD 00    jsr  $00,x
+FB1B: 20 A2    bra  $FABF
+FB1D: CE 00 00 ldx  #$0000
+FB20: 20 08    bra  $FB2A
+FB22: CE 00 01 ldx  #$0001
+FB25: 20 03    bra  $FB2A
+FB27: CE 00 02 ldx  #$0002
+FB2A: 6D 18    tst  $18,x
+FB2C: 27 12    beq  $FB40
+FB2E: 6A 18    dec  $18,x
+FB30: 26 0E    bne  $FB40
+FB32: E6 0C    ldb  $0C,x
+FB34: E7 18    stb  $18,x
+FB36: E6 00    ldb  $00,x
+FB38: EB 10    addb $10,x
+FB3A: E1 14    cmpb $14,x
+FB3C: 27 12    beq  $FB50
+FB3E: E7 00    stb  $00,x
+FB40: E6 00    ldb  $00,x
+FB42: E7 08    stb  $08,x
+FB44: AB 04    adda $04,x
+FB46: 60 04    neg  $04,x
+FB48: 16       tab  
+FB49: DE 28    ldx  $28
+FB4B: AD 00    jsr  $00,x
+FB4D: 7E FA BF jmp  $FABF
+FB50: DE 24    ldx  $24
+FB52: 39       rts  
+FB53: 86 70    lda  #$70
+FB55: 97 20    sta  $20
+FB57: 86 08    lda  #$08
+FB59: 97 21    sta  $21
+FB5B: 7E F9 D6 jmp  $F9D6
+FB5E: 86 01    lda  #$01
+FB60: 97 20    sta  $20
+FB62: 86 06    lda  #$06
+FB64: 97 21    sta  $21
+FB66: 7E F9 D6 jmp  $F9D6
+FB69: 86 A0    lda  #$A0
+FB6B: 97 20    sta  $20
+FB6D: 86 08    lda  #$08
+FB6F: 97 21    sta  $21
+FB71: 7E F9 46 jmp  $F946
+FB74: 86 03    lda  #$03
+FB76: 97 20    sta  $20
+FB78: 86 30    lda  #$30
+FB7A: 97 21    sta  $21
+FB7C: 7E F9 46 jmp  $F946
+FB7F: 86 C0    lda  #$C0
+FB81: 97 20    sta  $20
+FB83: 86 06    lda  #$06
+FB85: 97 21    sta  $21
+FB87: 7E F9 46 jmp  $F946
+FB8A: 86 FF    lda  #$FF
+FB8C: 97 20    sta  $20
+FB8E: 86 04    lda  #$04
+FB90: 97 21    sta  $21
+FB92: 7E F9 46 jmp  $F946
+FB95: 7E F9 93 jmp  $F993
+FB98: 54       lsrb 
+FB99: 54       lsrb 
+FB9A: 54       lsrb 
+FB9B: 54       lsrb 
+FB9C: 54       lsrb 
+FB9D: 54       lsrb 
+FB9E: 54       lsrb 
+FB9F: 54       lsrb 
+FBA0: F7 40 02 stb  $4002
+FBA3: 39       rts  
+FBA4: 36       psha 
+FBA5: C6 1C    ldb  #$1C
+FBA7: CE 00 00 ldx  #$0000
+FBAA: DF 22    stx  $22
+FBAC: A6 00    lda  $00,x
+FBAE: DF 24    stx  $24
+FBB0: DE 22    ldx  $22
+FBB2: A7 00    sta  $00,x
+FBB4: 08       inx  
+FBB5: DF 22    stx  $22
+FBB7: DE 24    ldx  $24
+FBB9: 08       inx  
+FBBA: 5A       decb 
+FBBB: 26 EF    bne  $FBAC
+FBBD: 32       pula 
+FBBE: 39       rts  
+FBBF: DF 24    stx  $24
+FBC1: 9B 25    adda $25
+FBC3: 97 25    sta  $25
+FBC5: 24 03    bcc  $FBCA
+FBC7: 7C 00 24 inc  $0024
+FBCA: DE 24    ldx  $24
+FBCC: 39       rts  
+FBCD: 8E 00 7F lds  #$007F
+FBD0: 0E       cli  
+FBD1: B6 40 00 lda  $4000
+FBD4: 27 25    beq  $FBFB
+FBD6: 2A 07    bpl  $FBDF
+FBD8: 84 7F    anda #$7F
+FBDA: 97 1E    sta  $1E
+FBDC: 7E FA 77 jmp  $FA77
+FBDF: 85 40    bita #$40
+FBE1: 27 0D    beq  $FBF0
+FBE3: 84 3F    anda #$3F
+FBE5: 97 20    sta  $20
+FBE7: 86 01    lda  #$01
+FBE9: 97 21    sta  $21
+FBEB: BD F9 D6 jsr  $F9D6
+FBEE: 20 FE    bra  $FBEE
+FBF0: 4A       deca 
+FBF1: 48       asla 
+FBF2: CE FB FD ldx  #$FBFD
+FBF5: 8D C8    bsr  $FBBF
+FBF7: EE 00    ldx  $00,x
+FBF9: AD 00    jsr  $00,x
+FBFB: 20 FE    bra  $FBFB
+FBFD: FB 53 FB addb $53FB
+FC00: 69 FA    rol  $FA,x
+FC02: 1D       illegal
+FC03: FA 3B FB orb  $3BFB
+FC06: 7F FB 8A clr  $FB8A
+FC09: FB 95 FA addb $95FA
+FC0C: 8F FB 5E sts  #$FB5E
+FC0F: FB 74 00 addb $7400
+FC12: 00       illegal
+FC13: 00       illegal
+FC14: 00       illegal
+FC15: 00       illegal
+FC16: 00       illegal
+FC17: 00       illegal
+FC18: 00       illegal
+FC19: 00       illegal
+FC1A: 00       illegal
+FC1B: 00       illegal
+FC1C: 00       illegal
+FC1D: 00       illegal
+FC1E: 00       illegal
+FC1F: 00       illegal
+FC20: 00       illegal
+FC21: 00       illegal
+FC22: 00       illegal
+FC23: 00       illegal
+FC24: 00       illegal
+FC25: 00       illegal
+FC26: 00       illegal
+FC27: 00       illegal
+FC28: 00       illegal
+FC29: 00       illegal
+FC2A: 00       illegal
+FC2B: 00       illegal
+FC2C: 00       illegal
+FC2D: 00       illegal
+FC2E: 00       illegal
+FC2F: 00       illegal
+FC30: 00       illegal
+FC31: 00       illegal
+FC32: 00       illegal
+FC33: 00       illegal
+FC34: 00       illegal
+FC35: 00       illegal
+FC36: 00       illegal
+FC37: 00       illegal
+FC38: 00       illegal
+FC39: 00       illegal
+FC3A: 00       illegal
+FC3B: 00       illegal
+FC3C: 00       illegal
+FC3D: 00       illegal
+FC3E: 00       illegal
+FC3F: 00       illegal
+FC40: 00       illegal
+FC41: 00       illegal
+FC42: 00       illegal
+FC43: 00       illegal
+FC44: 00       illegal
+FC45: 00       illegal
+FC46: 00       illegal
+FC47: 00       illegal
+FC48: 00       illegal
+FC49: 00       illegal
+FC4A: 00       illegal
+FC4B: 00       illegal
+FC4C: 00       illegal
+FC4D: 00       illegal
+FC4E: 00       illegal
+FC4F: 00       illegal
+FC50: 00       illegal
+FC51: 00       illegal
+FC52: 00       illegal
+FC53: 00       illegal
+FC54: 00       illegal
+FC55: 00       illegal
+FC56: 00       illegal
+FC57: 00       illegal
+FC58: 00       illegal
+FC59: 00       illegal
+FC5A: 00       illegal
+FC5B: 00       illegal
+FC5C: 00       illegal
+FC5D: 00       illegal
+FC5E: 00       illegal
+FC5F: 00       illegal
+FC60: 00       illegal
+FC61: 00       illegal
+FC62: 00       illegal
+FC63: 00       illegal
+FC64: 00       illegal
+FC65: 00       illegal
+FC66: 00       illegal
+FC67: 00       illegal
+FC68: 00       illegal
+FC69: 00       illegal
+FC6A: 00       illegal
+FC6B: 00       illegal
+FC6C: 00       illegal
+FC6D: 00       illegal
+FC6E: 00       illegal
+FC6F: 00       illegal
+FC70: 00       illegal
+FC71: 00       illegal
+FC72: 00       illegal
+FC73: 00       illegal
+FC74: 00       illegal
+FC75: 00       illegal
+FC76: 00       illegal
+FC77: 00       illegal
+FC78: 00       illegal
+FC79: 00       illegal
+FC7A: 00       illegal
+FC7B: 00       illegal
+FC7C: 00       illegal
+FC7D: 00       illegal
+FC7E: 00       illegal
+FC7F: 00       illegal
+FC80: 00       illegal
+FC81: 00       illegal
+FC82: 00       illegal
+FC83: 00       illegal
+FC84: 00       illegal
+FC85: 00       illegal
+FC86: 00       illegal
+FC87: 00       illegal
+FC88: 00       illegal
+FC89: 00       illegal
+FC8A: 00       illegal
+FC8B: 00       illegal
+FC8C: 00       illegal
+FC8D: 00       illegal
+FC8E: 00       illegal
+FC8F: 00       illegal
+FC90: 00       illegal
+FC91: 00       illegal
+FC92: 00       illegal
+FC93: 00       illegal
+FC94: 00       illegal
+FC95: 00       illegal
+FC96: 00       illegal
+FC97: 00       illegal
+FC98: 00       illegal
+FC99: 00       illegal
+FC9A: 00       illegal
+FC9B: 00       illegal
+FC9C: 00       illegal
+FC9D: 00       illegal
+FC9E: 00       illegal
+FC9F: 00       illegal
+FCA0: 00       illegal
+FCA1: 00       illegal
+FCA2: 00       illegal
+FCA3: 00       illegal
+FCA4: 00       illegal
+FCA5: 00       illegal
+FCA6: 00       illegal
+FCA7: 00       illegal
+FCA8: 00       illegal
+FCA9: 00       illegal
+FCAA: 00       illegal
+FCAB: 00       illegal
+FCAC: 00       illegal
+FCAD: 00       illegal
+FCAE: 00       illegal
+FCAF: 00       illegal
+FCB0: 00       illegal
+FCB1: 00       illegal
+FCB2: 00       illegal
+FCB3: 00       illegal
+FCB4: 00       illegal
+FCB5: 00       illegal
+FCB6: 00       illegal
+FCB7: 00       illegal
+FCB8: 00       illegal
+FCB9: 00       illegal
+FCBA: 00       illegal
+FCBB: 00       illegal
+FCBC: 00       illegal
+FCBD: 00       illegal
+FCBE: 00       illegal
+FCBF: 00       illegal
+FCC0: 00       illegal
+FCC1: 00       illegal
+FCC2: 00       illegal
+FCC3: 00       illegal
+FCC4: 00       illegal
+FCC5: 00       illegal
+FCC6: 00       illegal
+FCC7: 00       illegal
+FCC8: 00       illegal
+FCC9: 00       illegal
+FCCA: 00       illegal
+FCCB: 00       illegal
+FCCC: 00       illegal
+FCCD: 00       illegal
+FCCE: 00       illegal
+FCCF: 00       illegal
+FCD0: 00       illegal
+FCD1: 00       illegal
+FCD2: 00       illegal
+FCD3: 00       illegal
+FCD4: 00       illegal
+FCD5: 00       illegal
+FCD6: 00       illegal
+FCD7: 00       illegal
+FCD8: 00       illegal
+FCD9: 00       illegal
+FCDA: 00       illegal
+FCDB: 00       illegal
+FCDC: 00       illegal
+FCDD: 00       illegal
+FCDE: 00       illegal
+FCDF: 00       illegal
+FCE0: 00       illegal
+FCE1: 00       illegal
+FCE2: 00       illegal
+FCE3: 00       illegal
+FCE4: 00       illegal
+FCE5: 00       illegal
+FCE6: 00       illegal
+FCE7: 00       illegal
+FCE8: 00       illegal
+FCE9: 00       illegal
+FCEA: 00       illegal
+FCEB: 00       illegal
+FCEC: 00       illegal
+FCED: 00       illegal
+FCEE: 00       illegal
+FCEF: 00       illegal
+FCF0: 00       illegal
+FCF1: 00       illegal
+FCF2: 00       illegal
+FCF3: 00       illegal
+FCF4: 00       illegal
+FCF5: 00       illegal
+FCF6: 00       illegal
+FCF7: 00       illegal
+FCF8: 00       illegal
+FCF9: 00       illegal
+FCFA: 00       illegal
+FCFB: 00       illegal
+FCFC: 00       illegal
+FCFD: 00       illegal
+FCFE: 00       illegal
+FCFF: 00       illegal
+FD00: 00       illegal
+FD01: 00       illegal
+FD02: 00       illegal
+FD03: 00       illegal
+FD04: 00       illegal
+FD05: 00       illegal
+FD06: 00       illegal
+FD07: 00       illegal
+FD08: 00       illegal
+FD09: 00       illegal
+FD0A: 00       illegal
+FD0B: 00       illegal
+FD0C: 00       illegal
+FD0D: 00       illegal
+FD0E: 00       illegal
+FD0F: 00       illegal
+FD10: 00       illegal
+FD11: 00       illegal
+FD12: 00       illegal
+FD13: 00       illegal
+FD14: 00       illegal
+FD15: 00       illegal
+FD16: 00       illegal
+FD17: 00       illegal
+FD18: 00       illegal
+FD19: 00       illegal
+FD1A: 00       illegal
+FD1B: 00       illegal
+FD1C: 00       illegal
+FD1D: 00       illegal
+FD1E: 00       illegal
+FD1F: 00       illegal
+FD20: 00       illegal
+FD21: 00       illegal
+FD22: 00       illegal
+FD23: 00       illegal
+FD24: 00       illegal
+FD25: 00       illegal
+FD26: 00       illegal
+FD27: 00       illegal
+FD28: 00       illegal
+FD29: 00       illegal
+FD2A: 00       illegal
+FD2B: 00       illegal
+FD2C: 00       illegal
+FD2D: 00       illegal
+FD2E: 00       illegal
+FD2F: 00       illegal
+FD30: 00       illegal
+FD31: 00       illegal
+FD32: 00       illegal
+FD33: 00       illegal
+FD34: 00       illegal
+FD35: 00       illegal
+FD36: 00       illegal
+FD37: 00       illegal
+FD38: 00       illegal
+FD39: 00       illegal
+FD3A: 00       illegal
+FD3B: 00       illegal
+FD3C: 00       illegal
+FD3D: 00       illegal
+FD3E: 00       illegal
+FD3F: 00       illegal
+FD40: 00       illegal
+FD41: 00       illegal
+FD42: 00       illegal
+FD43: 00       illegal
+FD44: 00       illegal
+FD45: 00       illegal
+FD46: 00       illegal
+FD47: 00       illegal
+FD48: 00       illegal
+FD49: 00       illegal
+FD4A: 00       illegal
+FD4B: 00       illegal
+FD4C: 00       illegal
+FD4D: 00       illegal
+FD4E: 00       illegal
+FD4F: 00       illegal
+FD50: 00       illegal
+FD51: 00       illegal
+FD52: 00       illegal
+FD53: 00       illegal
+FD54: 00       illegal
+FD55: 00       illegal
+FD56: 00       illegal
+FD57: 00       illegal
+FD58: 00       illegal
+FD59: 00       illegal
+FD5A: 00       illegal
+FD5B: 00       illegal
+FD5C: 00       illegal
+FD5D: 00       illegal
+FD5E: 00       illegal
+FD5F: 00       illegal
+FD60: 00       illegal
+FD61: 00       illegal
+FD62: 00       illegal
+FD63: 00       illegal
+FD64: 00       illegal
+FD65: 00       illegal
+FD66: 00       illegal
+FD67: 00       illegal
+FD68: 00       illegal
+FD69: 00       illegal
+FD6A: 00       illegal
+FD6B: 00       illegal
+FD6C: 00       illegal
+FD6D: 00       illegal
+FD6E: 00       illegal
+FD6F: 00       illegal
+FD70: 00       illegal
+FD71: 00       illegal
+FD72: 00       illegal
+FD73: 00       illegal
+FD74: 00       illegal
+FD75: 00       illegal
+FD76: 00       illegal
+FD77: 00       illegal
+FD78: 00       illegal
+FD79: 00       illegal
+FD7A: 00       illegal
+FD7B: 00       illegal
+FD7C: 00       illegal
+FD7D: 00       illegal
+FD7E: 00       illegal
+FD7F: 00       illegal
+FD80: 00       illegal
+FD81: 00       illegal
+FD82: 00       illegal
+FD83: 00       illegal
+FD84: 00       illegal
+FD85: 00       illegal
+FD86: 00       illegal
+FD87: 00       illegal
+FD88: 00       illegal
+FD89: 00       illegal
+FD8A: 00       illegal
+FD8B: 00       illegal
+FD8C: 00       illegal
+FD8D: 00       illegal
+FD8E: 00       illegal
+FD8F: 00       illegal
+FD90: 00       illegal
+FD91: 00       illegal
+FD92: 00       illegal
+FD93: 00       illegal
+FD94: 00       illegal
+FD95: 00       illegal
+FD96: 00       illegal
+FD97: 00       illegal
+FD98: 00       illegal
+FD99: 00       illegal
+FD9A: 00       illegal
+FD9B: 00       illegal
+FD9C: 00       illegal
+FD9D: 00       illegal
+FD9E: 00       illegal
+FD9F: 00       illegal
+FDA0: 00       illegal
+FDA1: 00       illegal
+FDA2: 00       illegal
+FDA3: 00       illegal
+FDA4: 00       illegal
+FDA5: 00       illegal
+FDA6: 00       illegal
+FDA7: 00       illegal
+FDA8: 00       illegal
+FDA9: 00       illegal
+FDAA: 00       illegal
+FDAB: 00       illegal
+FDAC: 00       illegal
+FDAD: 00       illegal
+FDAE: 00       illegal
+FDAF: 00       illegal
+FDB0: 00       illegal
+FDB1: 00       illegal
+FDB2: 00       illegal
+FDB3: 00       illegal
+FDB4: 00       illegal
+FDB5: 00       illegal
+FDB6: 00       illegal
+FDB7: 00       illegal
+FDB8: 00       illegal
+FDB9: 00       illegal
+FDBA: 00       illegal
+FDBB: 00       illegal
+FDBC: 00       illegal
+FDBD: 00       illegal
+FDBE: 00       illegal
+FDBF: 00       illegal
+FDC0: 00       illegal
+FDC1: 00       illegal
+FDC2: 00       illegal
+FDC3: 00       illegal
+FDC4: 00       illegal
+FDC5: 00       illegal
+FDC6: 00       illegal
+FDC7: 00       illegal
+FDC8: 00       illegal
+FDC9: 00       illegal
+FDCA: 00       illegal
+FDCB: 00       illegal
+FDCC: 00       illegal
+FDCD: 00       illegal
+FDCE: 00       illegal
+FDCF: 00       illegal
+FDD0: 00       illegal
+FDD1: 00       illegal
+FDD2: 00       illegal
+FDD3: 00       illegal
+FDD4: 00       illegal
+FDD5: 00       illegal
+FDD6: 00       illegal
+FDD7: 00       illegal
+FDD8: 00       illegal
+FDD9: 00       illegal
+FDDA: 00       illegal
+FDDB: 00       illegal
+FDDC: 00       illegal
+FDDD: 00       illegal
+FDDE: 00       illegal
+FDDF: 00       illegal
+FDE0: 00       illegal
+FDE1: 00       illegal
+FDE2: 00       illegal
+FDE3: 00       illegal
+FDE4: 00       illegal
+FDE5: 00       illegal
+FDE6: 00       illegal
+FDE7: 00       illegal
+FDE8: 00       illegal
+FDE9: 00       illegal
+FDEA: 00       illegal
+FDEB: 00       illegal
+FDEC: 00       illegal
+FDED: 00       illegal
+FDEE: 00       illegal
+FDEF: 00       illegal
+FDF0: 00       illegal
+FDF1: 00       illegal
+FDF2: 00       illegal
+FDF3: 00       illegal
+FDF4: 00       illegal
+FDF5: 00       illegal
+FDF6: 00       illegal
+FDF7: 00       illegal
+FDF8: 00       illegal
+FDF9: 00       illegal
+FDFA: 00       illegal
+FDFB: 00       illegal
+FDFC: 00       illegal
+FDFD: 00       illegal
+FDFE: 00       illegal
+FDFF: 00       illegal
+FE00: 00       illegal
+FE01: 00       illegal
+FE02: 00       illegal
+FE03: 00       illegal
+FE04: 00       illegal
+FE05: 00       illegal
+FE06: 00       illegal
+FE07: 00       illegal
+FE08: 00       illegal
+FE09: 00       illegal
+FE0A: 00       illegal
+FE0B: 00       illegal
+FE0C: 00       illegal
+FE0D: 00       illegal
+FE0E: 00       illegal
+FE0F: 00       illegal
+FE10: 00       illegal
+FE11: 00       illegal
+FE12: 00       illegal
+FE13: 00       illegal
+FE14: 00       illegal
+FE15: 00       illegal
+FE16: 00       illegal
+FE17: 00       illegal
+FE18: 00       illegal
+FE19: 00       illegal
+FE1A: 00       illegal
+FE1B: 00       illegal
+FE1C: 00       illegal
+FE1D: 00       illegal
+FE1E: 00       illegal
+FE1F: 00       illegal
+FE20: 00       illegal
+FE21: 00       illegal
+FE22: 00       illegal
+FE23: 00       illegal
+FE24: 00       illegal
+FE25: 00       illegal
+FE26: 00       illegal
+FE27: 00       illegal
+FE28: 00       illegal
+FE29: 00       illegal
+FE2A: 00       illegal
+FE2B: 00       illegal
+FE2C: 00       illegal
+FE2D: 00       illegal
+FE2E: 00       illegal
+FE2F: 00       illegal
+FE30: 00       illegal
+FE31: 00       illegal
+FE32: 00       illegal
+FE33: 00       illegal
+FE34: 00       illegal
+FE35: 00       illegal
+FE36: 00       illegal
+FE37: 00       illegal
+FE38: 00       illegal
+FE39: 00       illegal
+FE3A: 00       illegal
+FE3B: 00       illegal
+FE3C: 00       illegal
+FE3D: 00       illegal
+FE3E: 00       illegal
+FE3F: 00       illegal
+FE40: 00       illegal
+FE41: 00       illegal
+FE42: 00       illegal
+FE43: 00       illegal
+FE44: 00       illegal
+FE45: 00       illegal
+FE46: 00       illegal
+FE47: 00       illegal
+FE48: 00       illegal
+FE49: 00       illegal
+FE4A: 00       illegal
+FE4B: 00       illegal
+FE4C: 00       illegal
+FE4D: 00       illegal
+FE4E: 00       illegal
+FE4F: 00       illegal
+FE50: 00       illegal
+FE51: 00       illegal
+FE52: 00       illegal
+FE53: 00       illegal
+FE54: 00       illegal
+FE55: 00       illegal
+FE56: 00       illegal
+FE57: 00       illegal
+FE58: 00       illegal
+FE59: 00       illegal
+FE5A: 00       illegal
+FE5B: 00       illegal
+FE5C: 00       illegal
+FE5D: 00       illegal
+FE5E: 00       illegal
+FE5F: 00       illegal
+FE60: 00       illegal
+FE61: 00       illegal
+FE62: 00       illegal
+FE63: 00       illegal
+FE64: 00       illegal
+FE65: 00       illegal
+FE66: 00       illegal
+FE67: 00       illegal
+FE68: 00       illegal
+FE69: 00       illegal
+FE6A: 00       illegal
+FE6B: 00       illegal
+FE6C: 00       illegal
+FE6D: 00       illegal
+FE6E: 00       illegal
+FE6F: 00       illegal
+FE70: 00       illegal
+FE71: 00       illegal
+FE72: 00       illegal
+FE73: 00       illegal
+FE74: 00       illegal
+FE75: 00       illegal
+FE76: 00       illegal
+FE77: 00       illegal
+FE78: 00       illegal
+FE79: 00       illegal
+FE7A: 00       illegal
+FE7B: 00       illegal
+FE7C: 00       illegal
+FE7D: 00       illegal
+FE7E: 00       illegal
+FE7F: 00       illegal
+FE80: 00       illegal
+FE81: 00       illegal
+FE82: 00       illegal
+FE83: 00       illegal
+FE84: 00       illegal
+FE85: 00       illegal
+FE86: 00       illegal
+FE87: 00       illegal
+FE88: 00       illegal
+FE89: 00       illegal
+FE8A: 00       illegal
+FE8B: 00       illegal
+FE8C: 00       illegal
+FE8D: 00       illegal
+FE8E: 00       illegal
+FE8F: 00       illegal
+FE90: 00       illegal
+FE91: 00       illegal
+FE92: 00       illegal
+FE93: 00       illegal
+FE94: 00       illegal
+FE95: 00       illegal
+FE96: 00       illegal
+FE97: 00       illegal
+FE98: 00       illegal
+FE99: 00       illegal
+FE9A: 00       illegal
+FE9B: 00       illegal
+FE9C: 00       illegal
+FE9D: 00       illegal
+FE9E: 00       illegal
+FE9F: 00       illegal
+FEA0: 00       illegal
+FEA1: 00       illegal
+FEA2: 00       illegal
+FEA3: 00       illegal
+FEA4: 00       illegal
+FEA5: 00       illegal
+FEA6: 00       illegal
+FEA7: 00       illegal
+FEA8: 00       illegal
+FEA9: 00       illegal
+FEAA: 00       illegal
+FEAB: 00       illegal
+FEAC: 00       illegal
+FEAD: 00       illegal
+FEAE: 00       illegal
+FEAF: 00       illegal
+FEB0: 00       illegal
+FEB1: 00       illegal
+FEB2: 00       illegal
+FEB3: 00       illegal
+FEB4: 00       illegal
+FEB5: 00       illegal
+FEB6: 00       illegal
+FEB7: 00       illegal
+FEB8: 00       illegal
+FEB9: 00       illegal
+FEBA: 00       illegal
+FEBB: 00       illegal
+FEBC: 00       illegal
+FEBD: 00       illegal
+FEBE: 00       illegal
+FEBF: 00       illegal
+FEC0: 00       illegal
+FEC1: 00       illegal
+FEC2: 00       illegal
+FEC3: 00       illegal
+FEC4: 00       illegal
+FEC5: 00       illegal
+FEC6: 00       illegal
+FEC7: 00       illegal
+FEC8: 00       illegal
+FEC9: 00       illegal
+FECA: 00       illegal
+FECB: 00       illegal
+FECC: 00       illegal
+FECD: 00       illegal
+FECE: 00       illegal
+FECF: 00       illegal
+FED0: 00       illegal
+FED1: 00       illegal
+FED2: 00       illegal
+FED3: 00       illegal
+FED4: 00       illegal
+FED5: 00       illegal
+FED6: 00       illegal
+FED7: 00       illegal
+FED8: 00       illegal
+FED9: 00       illegal
+FEDA: 00       illegal
+FEDB: 00       illegal
+FEDC: 00       illegal
+FEDD: 00       illegal
+FEDE: 00       illegal
+FEDF: 00       illegal
+FEE0: 00       illegal
+FEE1: 00       illegal
+FEE2: 00       illegal
+FEE3: 00       illegal
+FEE4: 00       illegal
+FEE5: 00       illegal
+FEE6: 00       illegal
+FEE7: 00       illegal
+FEE8: 00       illegal
+FEE9: 00       illegal
+FEEA: 00       illegal
+FEEB: 00       illegal
+FEEC: 00       illegal
+FEED: 00       illegal
+FEEE: 00       illegal
+FEEF: 00       illegal
+FEF0: 00       illegal
+FEF1: 00       illegal
+FEF2: 00       illegal
+FEF3: 00       illegal
+FEF4: 00       illegal
+FEF5: 00       illegal
+FEF6: 00       illegal
+FEF7: 00       illegal
+FEF8: 00       illegal
+FEF9: 00       illegal
+FEFA: 00       illegal
+FEFB: 00       illegal
+FEFC: 00       illegal
+FEFD: 00       illegal
+FEFE: 00       illegal
+FEFF: 00       illegal
+FF00: 00       illegal
+FF01: 00       illegal
+FF02: 00       illegal
+FF03: 00       illegal
+FF04: 00       illegal
+FF05: 00       illegal
+FF06: 00       illegal
+FF07: 00       illegal
+FF08: 00       illegal
+FF09: 00       illegal
+FF0A: 00       illegal
+FF0B: 00       illegal
+FF0C: 00       illegal
+FF0D: 00       illegal
+FF0E: 00       illegal
+FF0F: 00       illegal
+FF10: 00       illegal
+FF11: 00       illegal
+FF12: 00       illegal
+FF13: 00       illegal
+FF14: 00       illegal
+FF15: 00       illegal
+FF16: 00       illegal
+FF17: 00       illegal
+FF18: 00       illegal
+FF19: 00       illegal
+FF1A: 00       illegal
+FF1B: 00       illegal
+FF1C: 00       illegal
+FF1D: 00       illegal
+FF1E: 00       illegal
+FF1F: 00       illegal
+FF20: 00       illegal
+FF21: 00       illegal
+FF22: 00       illegal
+FF23: 00       illegal
+FF24: 00       illegal
+FF25: 00       illegal
+FF26: 00       illegal
+FF27: 00       illegal
+FF28: 00       illegal
+FF29: 00       illegal
+FF2A: 00       illegal
+FF2B: 00       illegal
+FF2C: 00       illegal
+FF2D: 00       illegal
+FF2E: 00       illegal
+FF2F: 00       illegal
+FF30: 00       illegal
+FF31: 00       illegal
+FF32: 00       illegal
+FF33: 00       illegal
+FF34: 00       illegal
+FF35: 00       illegal
+FF36: 00       illegal
+FF37: 00       illegal
+FF38: 00       illegal
+FF39: 00       illegal
+FF3A: 00       illegal
+FF3B: 00       illegal
+FF3C: 00       illegal
+FF3D: 00       illegal
+FF3E: 00       illegal
+FF3F: 00       illegal
+FF40: 00       illegal
+FF41: 00       illegal
+FF42: 00       illegal
+FF43: 00       illegal
+FF44: 00       illegal
+FF45: 00       illegal
+FF46: 00       illegal
+FF47: 00       illegal
+FF48: 00       illegal
+FF49: 00       illegal
+FF4A: 00       illegal
+FF4B: 00       illegal
+FF4C: 00       illegal
+FF4D: 00       illegal
+FF4E: 00       illegal
+FF4F: 00       illegal
+FF50: 00       illegal
+FF51: 00       illegal
+FF52: 00       illegal
+FF53: 00       illegal
+FF54: 00       illegal
+FF55: 00       illegal
+FF56: 00       illegal
+FF57: 00       illegal
+FF58: 00       illegal
+FF59: 00       illegal
+FF5A: 00       illegal
+FF5B: 00       illegal
+FF5C: 00       illegal
+FF5D: 00       illegal
+FF5E: 00       illegal
+FF5F: 00       illegal
+FF60: 00       illegal
+FF61: 00       illegal
+FF62: 00       illegal
+FF63: 00       illegal
+FF64: 00       illegal
+FF65: 00       illegal
+FF66: 00       illegal
+FF67: 00       illegal
+FF68: 00       illegal
+FF69: 00       illegal
+FF6A: 00       illegal
+FF6B: 00       illegal
+FF6C: 00       illegal
+FF6D: 00       illegal
+FF6E: 00       illegal
+FF6F: 00       illegal
+FF70: 00       illegal
+FF71: 00       illegal
+FF72: 00       illegal
+FF73: 00       illegal
+FF74: 00       illegal
+FF75: 00       illegal
+FF76: 00       illegal
+FF77: 00       illegal
+FF78: 00       illegal
+FF79: 00       illegal
+FF7A: 00       illegal
+FF7B: 00       illegal
+FF7C: 00       illegal
+FF7D: 00       illegal
+FF7E: 00       illegal
+FF7F: 00       illegal
+FF80: 00       illegal
+FF81: 00       illegal
+FF82: 00       illegal
+FF83: 00       illegal
+FF84: 00       illegal
+FF85: 00       illegal
+FF86: 00       illegal
+FF87: 00       illegal
+FF88: 00       illegal
+FF89: 00       illegal
+FF8A: 00       illegal
+FF8B: 00       illegal
+FF8C: 00       illegal
+FF8D: 00       illegal
+FF8E: 00       illegal
+FF8F: 00       illegal
+FF90: 00       illegal
+FF91: 00       illegal
+FF92: 00       illegal
+FF93: 00       illegal
+FF94: 00       illegal
+FF95: 00       illegal
+FF96: 00       illegal
+FF97: 00       illegal
+FF98: 00       illegal
+FF99: 00       illegal
+FF9A: 00       illegal
+FF9B: 00       illegal
+FF9C: 00       illegal
+FF9D: 00       illegal
+FF9E: 00       illegal
+FF9F: 00       illegal
+FFA0: 00       illegal
+FFA1: 00       illegal
+FFA2: 00       illegal
+FFA3: 00       illegal
+FFA4: 00       illegal
+FFA5: 00       illegal
+FFA6: 00       illegal
+FFA7: 00       illegal
+FFA8: 00       illegal
+FFA9: 00       illegal
+FFAA: 00       illegal
+FFAB: 00       illegal
+FFAC: 00       illegal
+FFAD: 00       illegal
+FFAE: 00       illegal
+FFAF: 00       illegal
+FFB0: 00       illegal
+FFB1: 00       illegal
+FFB2: 00       illegal
+FFB3: 00       illegal
+FFB4: 00       illegal
+FFB5: 00       illegal
+FFB6: 00       illegal
+FFB7: 00       illegal
+FFB8: 00       illegal
+FFB9: 00       illegal
+FFBA: 00       illegal
+FFBB: 00       illegal
+FFBC: 00       illegal
+FFBD: 00       illegal
+FFBE: 00       illegal
+FFBF: 00       illegal
+FFC0: 00       illegal
+FFC1: 00       illegal
+FFC2: 00       illegal
+FFC3: 00       illegal
+FFC4: 00       illegal
+FFC5: 00       illegal
+FFC6: 00       illegal
+FFC7: 00       illegal
+FFC8: 00       illegal
+FFC9: 00       illegal
+FFCA: 00       illegal
+FFCB: 00       illegal
+FFCC: 00       illegal
+FFCD: 00       illegal
+FFCE: 00       illegal
+FFCF: 00       illegal
+FFD0: 00       illegal
+FFD1: 00       illegal
+FFD2: 00       illegal
+FFD3: 00       illegal
+FFD4: 00       illegal
+FFD5: 00       illegal
+FFD6: 00       illegal
+FFD7: 00       illegal
+FFD8: 00       illegal
+FFD9: 00       illegal
+FFDA: 00       illegal
+FFDB: 00       illegal
+FFDC: 00       illegal
+FFDD: 00       illegal
+FFDE: 00       illegal
+FFDF: 00       illegal
+FFE0: 00       illegal
+FFE1: 00       illegal
+FFE2: 00       illegal
+FFE3: 00       illegal
+FFE4: 00       illegal
+FFE5: 00       illegal
+FFE6: 00       illegal
+FFE7: 00       illegal
+FFE8: 00       illegal
+FFE9: 00       illegal
+FFEA: 00       illegal
+FFEB: 00       illegal
+FFEC: 00       illegal
+FFED: 00       illegal
+FFEE: 00       illegal
+FFEF: 00       illegal
+FFF0: 00       illegal
+FFF1: 00       illegal
+FFF2: 00       illegal
+FFF3: 00       illegal
+FFF4: 00       illegal
+FFF5: 00       illegal
+FFF6: 00       illegal
+FFF7: 00       illegal
+FFF8: FB CD F9 addb $CDF9
+FFFB: 20 F9    bra  $FFF6
+FFFD: 20 F9    bra  $FFF8
+FFFF: 20 00    bra  $10001

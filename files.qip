@@ -5,6 +5,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/Qix.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/Qix_CPU.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/Qix_Video.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/Qix_Sound.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/sound/pia6821_sound.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/qix_display.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/qix_palette.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/qix_vram.sv
