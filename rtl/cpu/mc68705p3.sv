@@ -180,7 +180,7 @@ endfunction
 // ---------------------------------------------------------------------------
 // Branch condition evaluator for $2x opcodes
 // ---------------------------------------------------------------------------
-function automatic branch_true (input [7:0] op, input [4:0] cc);
+function automatic branch_true (input [7:0] op, input [4:0] cc, input irq_n_in);
     reg t;
     begin
         case (op[3:1])
@@ -191,7 +191,7 @@ function automatic branch_true (input [7:0] op, input [4:0] cc);
             3'd4: t = ~cc[CC_H];
             3'd5: t = ~cc[CC_N];
             3'd6: t = ~cc[CC_I];
-            3'd7: t = 1'b1;    // BIL: IRQ line — treat as always true (no /IRQ pin test)
+            3'd7: t = ~irq_n_in;   // BIL: branch if /IRQ low
             default: t = 1'b0;
         endcase
         branch_true = t ^ op[0];
@@ -560,7 +560,7 @@ always @(posedge clk) begin
                     end
                     // Branches $2x
                     8'b0010_????: begin
-                        if (branch_true(opcode, CC))
+                        if (branch_true(opcode, CC, irq_n))
                             PC <= PC + {{3{operand1[7]}}, operand1};
                     end
                     // RMW — memory ($3x direct, $6x IX1, $7x IX)
@@ -736,7 +736,7 @@ always @(posedge clk) begin
                             end
                             4'hD: begin
                                 // BSR ($AD) / JSR (rest): push PC then jump
-                                seq   <= 4'd10;     // JSR/BSR marker
+                                seq   <= 4'd11;     // JSR/BSR marker
                                 if (opcode == 8'hAD)
                                     ea <= PC + {{3{operand1[7]}}, operand1};
                                 // else ea already set
@@ -762,10 +762,11 @@ always @(posedge clk) begin
             end
 
             // -------- Push sequencer --------
-            // seq==0..4  : IRQ or SWI (push PCL/PCH/X/A/CC)
-            // seq==10    : JSR/BSR first push (PCL)
-            // seq==11    : JSR/BSR second push (PCH), then jump
-            S_PUSH: begin
+            // IRQ / SWI path (seq 0..10) — exactly 11 machine cycles total,
+            //                              exits directly to S_FETCH.
+            // JSR / BSR path (seq 11..13) — 3 MC in S_PUSH, remainder in S_WAIT.
+            S_PUSH: if (mc_tick) begin
+                if (cyc_left != 4'd0) cyc_left <= cyc_left - 4'd1;
                 case (seq)
                     4'd0:  begin wr_req <= 1'b1; wr_addr <= {4'd0, SP}; wr_data <= PC[7:0];
                                  SP <= SP - 7'd1; seq <= 4'd1; end
@@ -776,41 +777,37 @@ always @(posedge clk) begin
                     4'd3:  begin wr_req <= 1'b1; wr_addr <= {4'd0, SP}; wr_data <= A;
                                  SP <= SP - 7'd1; seq <= 4'd4; end
                     4'd4:  begin wr_req <= 1'b1; wr_addr <= {4'd0, SP}; wr_data <= {3'd0, CC};
-                                 SP <= SP - 7'd1; seq <= 4'd5; end
-                    4'd5:  begin
-                        // Load vector: /IRQ=$7FA, Timer=$7F8, SWI=$7FC
-                        CC[CC_I] <= 1'b1;
-                        if (swi_service) begin
-                            mem_raddr     <= 11'h7FC;
-                            latched_raddr <= 11'h7FC;
-                        end else begin
-                            mem_raddr     <= 11'h7FA;
-                            latched_raddr <= 11'h7FA;
-                        end
-                        seq   <= 4'd6;
+                                 SP <= SP - 7'd1; CC[CC_I] <= 1'b1; seq <= 4'd5; end
+                    4'd5:  seq <= 4'd6;    // dummy internal MC
+                    4'd6:  seq <= 4'd7;    // dummy internal MC
+                    4'd7:  begin           // issue vector-hi fetch
+                        mem_raddr     <= swi_service ? 11'h7FC : 11'h7FA;
+                        latched_raddr <= swi_service ? 11'h7FC : 11'h7FA;
+                        seq           <= 4'd8;
                     end
-                    4'd6:  begin
-                        // wait 1 clk for eprom_q
-                        mem_raddr     <= (swi_service ? 11'h7FD : 11'h7FB);
-                        latched_raddr <= (swi_service ? 11'h7FD : 11'h7FB);
-                        seq <= 4'd7;
+                    4'd8:  begin           // issue vector-lo fetch (pipeline gap)
+                        mem_raddr     <= swi_service ? 11'h7FD : 11'h7FB;
+                        latched_raddr <= swi_service ? 11'h7FD : 11'h7FB;
+                        seq           <= 4'd9;
                     end
-                    4'd7:  begin
+                    4'd9:  begin           // latch vector hi
                         PC[10:8] <= eprom_q[2:0];
-                        seq <= 4'd8;
+                        seq      <= 4'd10;
                     end
-                    4'd8:  begin
-                        PC[7:0] <= eprom_q;
-                        state  <= S_WAIT;
+                    4'd10: begin           // latch vector lo, jump directly to fetch
+                        PC[7:0]     <= eprom_q;
                         irq_service <= 1'b0;
                         swi_service <= 1'b0;
+                        seq         <= 4'd0;
+                        cyc_left    <= 4'd0;
+                        state       <= S_FETCH;
                     end
-                    // JSR/BSR path
-                    4'd10: begin wr_req <= 1'b1; wr_addr <= {4'd0, SP}; wr_data <= PC[7:0];
-                                 SP <= SP - 7'd1; seq <= 4'd11; end
-                    4'd11: begin wr_req <= 1'b1; wr_addr <= {4'd0, SP}; wr_data <= {5'd0, PC[10:8]};
+                    // JSR / BSR path
+                    4'd11: begin wr_req <= 1'b1; wr_addr <= {4'd0, SP}; wr_data <= PC[7:0];
                                  SP <= SP - 7'd1; seq <= 4'd12; end
-                    4'd12: begin PC <= ea; state <= S_WAIT; end
+                    4'd12: begin wr_req <= 1'b1; wr_addr <= {4'd0, SP}; wr_data <= {5'd0, PC[10:8]};
+                                 SP <= SP - 7'd1; seq <= 4'd13; end
+                    4'd13: begin PC <= ea; seq <= 4'd0; state <= S_WAIT; end
                     default: state <= S_WAIT;
                 endcase
             end
@@ -818,7 +815,8 @@ always @(posedge clk) begin
             // -------- Pull sequencer (RTI / RTS) --------
             // RTI: seq 0..4 pulls CC, A, X, PCH, PCL
             // RTS: seq 10..11 pulls PCH, PCL
-            S_PULL: begin
+            S_PULL: if (mc_tick) begin
+                if (cyc_left != 4'd0) cyc_left <= cyc_left - 4'd1;
                 case (seq)
                     4'd0: begin SP <= SP + 7'd1; mem_raddr <= {4'd0, SP + 7'd1};
                                 latched_raddr <= {4'd0, SP + 7'd1}; seq <= 4'd1; end
