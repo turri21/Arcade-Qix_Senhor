@@ -30,6 +30,8 @@ module mc68705p3 (
     // Port A (open-drain, 8-bit)
     input  wire [7:0]  pa_in,
     output wire [7:0]  pa_out,
+    output wire [7:0]  pa_latch_out,   // raw PA latch value
+    output wire        pa_wr_stb,      // pulses 1 clk when MCU writes to PA
 
     // Port B (push-pull, 8-bit)
     input  wire [7:0]  pb_in,
@@ -100,8 +102,16 @@ reg        irq_pending, irq_line_r;
 // ---------------------------------------------------------------------------
 // Port output / read-back
 // ---------------------------------------------------------------------------
-assign pa_out   = pa_latch | ~pa_ddr;
-assign pb_out   = pb_latch;
+assign pa_out       = pa_latch | ~pa_ddr;
+assign pa_latch_out = pa_latch;
+assign pb_out       = pb_latch;
+
+// pa_wr_stb: pulses one clk AFTER pa_latch updates (deferred write is clk+1)
+reg pa_wr_stb_r;
+always @(posedge clk)
+    pa_wr_stb_r <= wr_req && (wr_addr[10:0] == 11'h000);
+    
+assign pa_wr_stb = pa_wr_stb_r;
 assign pb_ddr   = pb_ddr_r;
 assign pc_out   = pc_latch;
 assign pc_ddr   = pc_ddr_r;

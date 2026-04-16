@@ -7,7 +7,7 @@
     <manufacturer>Taito America Corporation</manufacturer>
     <players>2</players>
     <joystick>4-Way</joystick>
-    <rotation>vertical (ccw)</rotation>
+    <rotation>horizontal</rotation>
     <region>World</region>
     <category>Maze</category>
 

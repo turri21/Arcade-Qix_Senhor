@@ -148,7 +148,7 @@ mc6809e data_cpu (
     .AVMA   (),
     .BUSY   (),
     .LIC    (),
-    .nHALT  (~pause & ~mcu_cpu_halt),
+    .nHALT  (~pause),
     .nRESET (~reset)
 );
 
@@ -363,23 +363,11 @@ end
 //   - PIA2 PB[2] → /IRQ (active-low when bit is high)
 // ---------------------------------------------------------------------------
 
-// Halt 6809 while MCU processes IRQ — gives MCU time to run handler
-// before 6809 reads the response. 64 E-cycles ≈ 51µs at 1.25MHz.
-reg [6:0] mcu_halt_cnt = 7'd0;
-wire      mcu_cpu_halt = (mcu_halt_cnt != 7'd0) & is_mcu_game;
-
-reg mcu_irq_n_r = 1'b1;
-always @(posedge clk_20m) mcu_irq_n_r <= mcu_irq_n;
-
-always @(posedge clk_20m) begin
-    if (reset) begin
-        mcu_halt_cnt <= 7'd0;
-    end else if (is_mcu_game & ~mcu_irq_n & mcu_irq_n_r) begin
-        mcu_halt_cnt <= 7'd64;
-    end else if (mcu_halt_cnt != 7'd0 && ce_E_fall) begin
-        mcu_halt_cnt <= mcu_halt_cnt - 7'd1;
-    end
-end
+// MCU and 6809 run concurrently — no halting needed or wanted.
+// The 6809 takes ~40-100µs between asserting mcu_irq_n and returning
+// to read the MCU response, which is sufficient for the MCU handler
+// to complete at 1 MHz. Halting caused a deadlock: the IRQ line could
+// never de-assert while the 6809 was halted.
 
 // 4 MHz enable from 20 MHz: pulse one-in-five clk_20m ticks.
 reg [2:0] mcu_ce_div = 3'd0;
@@ -401,56 +389,58 @@ wire [7:0] mcu_pb_in = {3'b000, coin_input[7], coin_input[3:0]};
 wire [3:0] mcu_pc_in = {pia2_pb_o[3], coin_input[6:4]};
 wire       mcu_irq_n = ~pia2_pb_o[2];
 
+wire [7:0] mcu_pa_latch;
+wire       mcu_pa_wr_stb;
+
 mc68705p3 mcu (
-    .clk      (clk_20m),
-    .ce_4m    (mcu_ce_4m),
-    .reset    (reset),
-    .irq_n    (mcu_irq_n),
-    .pa_in    (pia0_pb_o),
-    .pa_out   (mcu_pa_out),
-    .pb_in    (mcu_pb_in),
-    .pb_out   (),
-    .pb_ddr   (),
-    .pc_in    (mcu_pc_in),
-    .pc_out   (),
-    .pc_ddr   (),
-    .rom_wr   (mcu_rom_wr),
-    .rom_addr (mcu_rom_addr),
-    .rom_data (mcu_rom_data)
+    .clk         (clk_20m),
+    .ce_4m       (mcu_ce_4m),
+    .reset       (reset),
+    .irq_n       (mcu_irq_n),
+    .pa_in       (pia0_pb_o),
+    .pa_out      (mcu_pa_out),
+    .pa_latch_out(mcu_pa_latch),
+    .pa_wr_stb   (mcu_pa_wr_stb),
+    .pb_in       (mcu_pb_in),
+    .pb_out      (),
+    .pb_ddr      (),
+    .pc_in       (mcu_pc_in),
+    .pc_out      (),
+    .pc_ddr      (),
+    .rom_wr      (mcu_rom_wr),
+    .rom_addr    (mcu_rom_addr),
+    .rom_data    (mcu_rom_data)
 );
 
 // ---------------------------------------------------------------------------
 // CPU data bus read mux — default $FF for open-bus / unimplemented reads
 // ---------------------------------------------------------------------------
 
-// MCU games: intercept PIA0 port B reads and return MCU PA output directly.
-// The PIA ignores pb_i when DDRB=FF (output mode), but the game reads port B
-// expecting the MCU's response. Bypassing the PIA here delivers mcu_pa_out
-// regardless of DDR state. Non-MCU games read PIA0 normally.
+// MCU games: return cached MCU PA latch to 6809 reads of PIA0 port B.
+// Mirrors MAME's mcu_porta_w callback: cache pa_latch on every STA PA
+// regardless of DDRA state (sd101 pulses DDRA high, yy101 pulses it low).
 
-// MCU reply latch — captures mcu_pa_out at the end of the halt window,
-// guaranteeing the 6809 sees a stable fully-processed reply.
-reg [7:0] mcu_reply_latched = 8'h00;
+reg [7:0] mcu_porta_cache = 8'h00;
 
 always @(posedge clk_20m) begin
     if (reset)
-        mcu_reply_latched <= 8'h00;
-    else if (is_mcu_game && mcu_halt_cnt == 7'd1 && ce_E_fall)
-        mcu_reply_latched <= mcu_pa_out;
+        mcu_porta_cache <= 8'h00;
+    else if (is_mcu_game && mcu_pa_wr_stb)
+        mcu_porta_cache <= mcu_pa_latch;
 end
 
 wire pia0_pb_read = pia0_cs & cpu_RnW & (cpu_A[1:0] == 2'b10);
 
 assign cpu_Din =
-    shared_cs                        ? shared_dout    :
-    local_cs                         ? local_ram_dout :
-    acia_cs                          ? 8'h02          :
-    sndpia_cs                        ? sndpia_dout    :
-    (pia0_pb_read & is_mcu_game)     ? mcu_reply_latched :
-    pia0_cs                          ? pia0_dout      :
-    pia1_cs                          ? pia1_dout      :
-    pia2_cs                          ? pia2_dout      :
-    rom_cs                           ? rom_dout       :
+    shared_cs                        ? shared_dout     :
+    local_cs                         ? local_ram_dout  :
+    acia_cs                          ? 8'h02           :
+    sndpia_cs                        ? sndpia_dout     :
+    (pia0_pb_read & is_mcu_game)     ? mcu_porta_cache :
+    pia0_cs                          ? pia0_dout       :
+    pia1_cs                          ? pia1_dout       :
+    pia2_cs                          ? pia2_dout       :
+    rom_cs                           ? rom_dout        :
     8'hFF;
 
 endmodule

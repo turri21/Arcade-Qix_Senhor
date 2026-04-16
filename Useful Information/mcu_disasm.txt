@@ -1,0 +1,1014 @@
+
+=================================================================
+ROM: sd101 (Space Dungeon MCU)
+  RESET:$0093  /IRQ:$0080  Timer:$0190  SWI:$0191
+=================================================================
+
+--- Full EPROM (user code $0080-$07FF) ---
+  $0080: B6 14     LDA $14
+  $0082: B7 00     STA PA
+  $0084: A6 FF     LDA # #$FF
+  $0086: B7 04     STA DDRA
+  $0088: A6 02     LDA # #$02
+  $008A: CD 01 8C  JSR $018C
+  $008D: CD 01 51  JSR $0151
+  $0090: 3F 04     CLR DDRA
+  $0092: 80        RTI 
+  $0093: 9B        ???9B 
+  $0094: 9C        ???9C 
+  $0095: CD 01 70  JSR $0170
+  $0098: CD 01 83  JSR $0183
+  $009B: CD 01 0D  JSR $010D
+  $009E: CD 01 51  JSR $0151
+  $00A1: 9A        ???9A 
+  $00A2: 06 02 FD  BRSET 3 PC,$00A2
+  $00A5: 07 02 FD  BRCLR 3 PC,$00A5
+  $00A8: BE 00     LDX PA
+  $00AA: DC 00 AA  ???DC $00AA,X
+  $00AD: CC 00 E9  JMP $00E9
+  $00B0: CC 00 F1  JMP $00F1
+  $00B3: CC 00 F9  JMP $00F9
+  $00B6: CC 01 01  JMP $0101
+  $00B9: CC 01 22  JMP $0122
+  $00BC: CC 01 38  JMP $0138
+  $00BF: CC 01 09  JMP $0109
+  $00C2: CC 01 0B  JMP $010B
+  $00C5: CC 00 F1  JMP $00F1
+  $00C8: CC 00 F1  JMP $00F1
+  $00CB: CC 00 F1  JMP $00F1
+  $00CE: CC 00 F1  JMP $00F1
+  $00D1: CC 00 F1  JMP $00F1
+  $00D4: CC 00 F1  JMP $00F1
+  $00D7: CC 00 F1  JMP $00F1
+  $00DA: CC 00 F1  JMP $00F1
+  $00DD: CC 00 F1  JMP $00F1
+  $00E0: CC 00 F1  JMP $00F1
+  $00E3: CC 00 F1  JMP $00F1
+  $00E6: CC 00 F1  JMP $00F1
+  $00E9: B6 01     LDA PB
+  $00EB: A4 9F     AND # #$9F
+  $00ED: B7 01     STA PB
+  $00EF: BC A2     JMP $A2
+  $00F1: B6 01     LDA PB
+  $00F3: AA 60     ORA # #$60
+  $00F5: B7 01     STA PB
+  $00F7: BC A2     JMP $A2
+  $00F9: B6 01     LDA PB
+  $00FB: AA 80     ORA # #$80
+  $00FD: B7 01     STA PB
+  $00FF: BC A2     JMP $A2
+  $0101: B6 01     LDA PB
+  $0103: A4 7F     AND # #$7F
+  $0105: B7 01     STA PB
+  $0107: BC A2     JMP $A2
+  $0109: BC A2     JMP $A2
+  $010B: BC A2     JMP $A2
+  $010D: 3F 12     CLR $12
+  $010F: C6 06 84  LDA $0684
+  $0112: 97        ???97 
+  $0113: 44        LSRA 
+  $0114: 44        LSRA 
+  $0115: 44        LSRA 
+  $0116: 44        LSRA 
+  $0117: 58        LSLX 
+  $0118: 58        LSLX 
+  $0119: 58        LSLX 
+  $011A: 58        LSLX 
+  $011B: BF 10     STX $10
+  $011D: BA 10     ORA $10
+  $011F: B7 13     STA $13
+  $0121: 81        RTS 
+  $0122: 3F 12     CLR $12
+  $0124: C6 06 84  LDA $0684
+  $0127: 97        ???97 
+  $0128: 44        LSRA 
+  $0129: 44        LSRA 
+  $012A: 44        LSRA 
+  $012B: 44        LSRA 
+  $012C: 58        LSLX 
+  $012D: 58        LSLX 
+  $012E: 58        LSLX 
+  $012F: 58        LSLX 
+  $0130: BF 10     STX $10
+  $0132: BA 10     ORA $10
+  $0134: B7 13     STA $13
+  $0136: BC A2     JMP $A2
+  $0138: BE 12     LDX $12
+  $013A: 5C        INCX 
+  $013B: BF 12     STX $12
+  $013D: D6 06 84  LDA $0684,X
+  $0140: 97        ???97 
+  $0141: 44        LSRA 
+  $0142: 44        LSRA 
+  $0143: 44        LSRA 
+  $0144: 44        LSRA 
+  $0145: 58        LSLX 
+  $0146: 58        LSLX 
+  $0147: 58        LSLX 
+  $0148: 58        LSLX 
+  $0149: BF 10     STX $10
+  $014B: BA 10     ORA $10
+  $014D: B7 13     STA $13
+  $014F: BC A2     JMP $A2
+  $0151: B6 01     LDA PB
+  $0153: A5 10     BIT # #$10
+  $0155: 26 04     BNE $015B
+  $0157: A4 0F     AND # #$0F
+  $0159: 20 04     BRA $015F
+  $015B: A4 0F     AND # #$0F
+  $015D: AA 80     ORA # #$80
+  $015F: B7 11     STA $11
+  $0161: B6 02     LDA PC
+  $0163: A4 07     AND # #$07
+  $0165: 48        LSLA 
+  $0166: 48        LSLA 
+  $0167: 48        LSLA 
+  $0168: 48        LSLA 
+  $0169: BA 11     ORA $11
+  $016B: B8 13     EOR $13
+  $016D: B7 14     STA $14
+  $016F: 81        RTS 
+  $0170: A6 00     LDA # #$00
+  $0172: B7 04     STA DDRA
+  $0174: A6 E0     LDA # #$E0
+  $0176: B7 05     STA DDRB
+  $0178: A6 00     LDA # #$00
+  $017A: B7 06     STA DDRC
+  $017C: B7 00     STA PA
+  $017E: B7 01     STA PB
+  $0180: B7 02     STA PC
+  $0182: 81        RTS 
+  $0183: AE 10     LDX # #$10
+  $0185: 7F        CLR ,X 
+  $0186: 5C        INCX 
+  $0187: A3 61     CPX # #$61
+  $0189: 25 FA     BCS $0185
+  $018B: 81        RTS 
+  $018C: 4A        DECA 
+  $018D: 26 FD     BNE $018C
+  $018F: 81        RTS 
+  $0190: 80        RTI 
+  $0191: 80        RTI 
+  $0192: 00 00 00  BRSET 0 PA,$0195
+  $0195: 00 00 00  BRSET 0 PA,$0198
+  $0198: 00 00 00  BRSET 0 PA,$019B
+  $019B: 00 00 00  BRSET 0 PA,$019E
+  $019E: 00 00 00  BRSET 0 PA,$01A1
+  $01A1: 00 00 00  BRSET 0 PA,$01A4
+  $01A4: 00 00 00  BRSET 0 PA,$01A7
+  $01A7: 00 00 00  BRSET 0 PA,$01AA
+  $01AA: 00 00 00  BRSET 0 PA,$01AD
+  $01AD: 00 00 00  BRSET 0 PA,$01B0
+  $01B0: 00 00 00  BRSET 0 PA,$01B3
+  $01B3: 00 00 00  BRSET 0 PA,$01B6
+  $01B6: 00 00 00  BRSET 0 PA,$01B9
+  $01B9: 00 00 00  BRSET 0 PA,$01BC
+  $01BC: 00 00 00  BRSET 0 PA,$01BF
+  $01BF: 00 00 00  BRSET 0 PA,$01C2
+  $01C2: 00 00 00  BRSET 0 PA,$01C5
+  $01C5: 00 00 00  BRSET 0 PA,$01C8
+  $01C8: 00 00 00  BRSET 0 PA,$01CB
+  $01CB: 00 00 00  BRSET 0 PA,$01CE
+  $01CE: 00 00 00  BRSET 0 PA,$01D1
+  $01D1: 00 00 00  BRSET 0 PA,$01D4
+  $01D4: 00 00 00  BRSET 0 PA,$01D7
+  $01D7: 00 00 00  BRSET 0 PA,$01DA
+  $01DA: 00 00 00  BRSET 0 PA,$01DD
+  $01DD: 00 00 00  BRSET 0 PA,$01E0
+  $01E0: 00 00 00  BRSET 0 PA,$01E3
+  $01E3: 00 00 00  BRSET 0 PA,$01E6
+  $01E6: 00 00 00  BRSET 0 PA,$01E9
+  $01E9: 00 00 00  BRSET 0 PA,$01EC
+  $01EC: 00 00 00  BRSET 0 PA,$01EF
+  $01EF: 00 00 00  BRSET 0 PA,$01F2
+  $01F2: 00 00 00  BRSET 0 PA,$01F5
+  $01F5: 00 00 00  BRSET 0 PA,$01F8
+  $01F8: 00 00 00  BRSET 0 PA,$01FB
+  $01FB: 00 00 00  BRSET 0 PA,$01FE
+  $01FE: 00 00 00  BRSET 0 PA,$0201
+  $0201: 00 00 00  BRSET 0 PA,$0204
+  $0204: 00 00 00  BRSET 0 PA,$0207
+  $0207: 00 00 00  BRSET 0 PA,$020A
+  $020A: 00 00 00  BRSET 0 PA,$020D
+  $020D: 00 00 00  BRSET 0 PA,$0210
+  $0210: 00 00 00  BRSET 0 PA,$0213
+  $0213: 00 00 00  BRSET 0 PA,$0216
+  $0216: 00 00 00  BRSET 0 PA,$0219
+  $0219: 00 00 00  BRSET 0 PA,$021C
+  $021C: 00 00 00  BRSET 0 PA,$021F
+  $021F: 00 00 00  BRSET 0 PA,$0222
+  $0222: 00 00 00  BRSET 0 PA,$0225
+  $0225: 00 00 00  BRSET 0 PA,$0228
+  $0228: 00 00 00  BRSET 0 PA,$022B
+  $022B: 00 00 00  BRSET 0 PA,$022E
+  $022E: 00 00 00  BRSET 0 PA,$0231
+  $0231: 00 00 00  BRSET 0 PA,$0234
+  $0234: 00 00 00  BRSET 0 PA,$0237
+  $0237: 00 00 00  BRSET 0 PA,$023A
+  $023A: 00 00 00  BRSET 0 PA,$023D
+  $023D: 00 00 00  BRSET 0 PA,$0240
+  $0240: 00 00 00  BRSET 0 PA,$0243
+  $0243: 00 00 00  BRSET 0 PA,$0246
+  $0246: 00 00 00  BRSET 0 PA,$0249
+  $0249: 00 00 00  BRSET 0 PA,$024C
+  $024C: 00 00 00  BRSET 0 PA,$024F
+  $024F: 00 00 00  BRSET 0 PA,$0252
+  $0252: 00 00 00  BRSET 0 PA,$0255
+  $0255: 00 00 00  BRSET 0 PA,$0258
+  $0258: 00 00 00  BRSET 0 PA,$025B
+  $025B: 00 00 00  BRSET 0 PA,$025E
+  $025E: 00 00 00  BRSET 0 PA,$0261
+  $0261: 00 00 00  BRSET 0 PA,$0264
+  $0264: 00 00 00  BRSET 0 PA,$0267
+  $0267: 00 00 00  BRSET 0 PA,$026A
+  $026A: 00 00 00  BRSET 0 PA,$026D
+  $026D: 00 00 00  BRSET 0 PA,$0270
+  $0270: 00 00 00  BRSET 0 PA,$0273
+  $0273: 00 00 00  BRSET 0 PA,$0276
+  $0276: 00 00 00  BRSET 0 PA,$0279
+  $0279: 00 00 00  BRSET 0 PA,$027C
+  $027C: 00 00 00  BRSET 0 PA,$027F
+  $027F: 00 00 00  BRSET 0 PA,$0282
+  $0282: 00 00 00  BRSET 0 PA,$0285
+  $0285: 00 00 00  BRSET 0 PA,$0288
+  $0288: 00 00 00  BRSET 0 PA,$028B
+  $028B: 00 00 00  BRSET 0 PA,$028E
+  $028E: 00 00 00  BRSET 0 PA,$0291
+  $0291: 00 00 00  BRSET 0 PA,$0294
+  $0294: 00 00 00  BRSET 0 PA,$0297
+  $0297: 00 00 00  BRSET 0 PA,$029A
+  $029A: 00 00 00  BRSET 0 PA,$029D
+  $029D: 00 00 00  BRSET 0 PA,$02A0
+  $02A0: 00 00 00  BRSET 0 PA,$02A3
+  $02A3: 00 00 00  BRSET 0 PA,$02A6
+  $02A6: 00 00 00  BRSET 0 PA,$02A9
+  $02A9: 00 00 00  BRSET 0 PA,$02AC
+  $02AC: 00 00 00  BRSET 0 PA,$02AF
+  $02AF: 00 00 00  BRSET 0 PA,$02B2
+  $02B2: 00 00 00  BRSET 0 PA,$02B5
+  $02B5: 00 00 00  BRSET 0 PA,$02B8
+  $02B8: 00 00 00  BRSET 0 PA,$02BB
+  $02BB: 00 00 00  BRSET 0 PA,$02BE
+  $02BE: 00 00 00  BRSET 0 PA,$02C1
+  $02C1: 00 00 00  BRSET 0 PA,$02C4
+  $02C4: 00 00 00  BRSET 0 PA,$02C7
+  $02C7: 00 00 00  BRSET 0 PA,$02CA
+  $02CA: 00 00 00  BRSET 0 PA,$02CD
+  $02CD: 00 00 00  BRSET 0 PA,$02D0
+  $02D0: 00 00 00  BRSET 0 PA,$02D3
+  $02D3: 00 00 00  BRSET 0 PA,$02D6
+  $02D6: 00 00 00  BRSET 0 PA,$02D9
+  $02D9: 00 00 00  BRSET 0 PA,$02DC
+  $02DC: 00 00 00  BRSET 0 PA,$02DF
+  $02DF: 00 00 00  BRSET 0 PA,$02E2
+  $02E2: 00 00 00  BRSET 0 PA,$02E5
+  $02E5: 00 00 00  BRSET 0 PA,$02E8
+  $02E8: 00 00 00  BRSET 0 PA,$02EB
+  $02EB: 00 00 00  BRSET 0 PA,$02EE
+  $02EE: 00 00 00  BRSET 0 PA,$02F1
+  $02F1: 00 00 00  BRSET 0 PA,$02F4
+  $02F4: 00 00 00  BRSET 0 PA,$02F7
+  $02F7: 00 00 00  BRSET 0 PA,$02FA
+  $02FA: 00 00 00  BRSET 0 PA,$02FD
+  $02FD: 00 00 00  BRSET 0 PA,$0300
+  $0300: 00 00 00  BRSET 0 PA,$0303
+  $0303: 00 00 00  BRSET 0 PA,$0306
+  $0306: 00 00 00  BRSET 0 PA,$0309
+  $0309: 00 00 00  BRSET 0 PA,$030C
+  $030C: 00 00 00  BRSET 0 PA,$030F
+  $030F: 00 00 00  BRSET 0 PA,$0312
+  $0312: 00 00 00  BRSET 0 PA,$0315
+  $0315: 00 00 00  BRSET 0 PA,$0318
+  $0318: 00 00 00  BRSET 0 PA,$031B
+  $031B: 00 00 00  BRSET 0 PA,$031E
+  $031E: 00 00 00  BRSET 0 PA,$0321
+  $0321: 00 00 00  BRSET 0 PA,$0324
+  $0324: 00 00 00  BRSET 0 PA,$0327
+  $0327: 00 00 00  BRSET 0 PA,$032A
+  $032A: 00 00 00  BRSET 0 PA,$032D
+  $032D: 00 00 00  BRSET 0 PA,$0330
+  $0330: 00 00 00  BRSET 0 PA,$0333
+  $0333: 00 00 00  BRSET 0 PA,$0336
+  $0336: 00 00 00  BRSET 0 PA,$0339
+  $0339: 00 00 00  BRSET 0 PA,$033C
+  $033C: 00 00 00  BRSET 0 PA,$033F
+  $033F: 00 00 00  BRSET 0 PA,$0342
+  $0342: 00 00 00  BRSET 0 PA,$0345
+  $0345: 00 00 00  BRSET 0 PA,$0348
+  $0348: 00 00 00  BRSET 0 PA,$034B
+  $034B: 00 00 00  BRSET 0 PA,$034E
+  $034E: 00 00 00  BRSET 0 PA,$0351
+  $0351: 00 00 00  BRSET 0 PA,$0354
+  $0354: 00 00 00  BRSET 0 PA,$0357
+  $0357: 00 00 00  BRSET 0 PA,$035A
+  $035A: 00 00 00  BRSET 0 PA,$035D
+  $035D: 00 00 00  BRSET 0 PA,$0360
+  $0360: 00 00 00  BRSET 0 PA,$0363
+  $0363: 00 00 00  BRSET 0 PA,$0366
+  $0366: 00 00 00  BRSET 0 PA,$0369
+  $0369: 00 00 00  BRSET 0 PA,$036C
+  $036C: 00 00 00  BRSET 0 PA,$036F
+  $036F: 00 00 00  BRSET 0 PA,$0372
+  $0372: 00 00 00  BRSET 0 PA,$0375
+  $0375: 00 00 00  BRSET 0 PA,$0378
+  $0378: 00 00 00  BRSET 0 PA,$037B
+  $037B: 00 00 00  BRSET 0 PA,$037E
+  $037E: 00 00 00  BRSET 0 PA,$0381
+  $0381: 00 00 00  BRSET 0 PA,$0384
+  $0384: 00 00 00  BRSET 0 PA,$0387
+  $0387: 00 00 00  BRSET 0 PA,$038A
+  $038A: 00 00 00  BRSET 0 PA,$038D
+  $038D: 00 00 00  BRSET 0 PA,$0390
+  $0390: 00 00 00  BRSET 0 PA,$0393
+  $0393: 00 00 00  BRSET 0 PA,$0396
+  $0396: 00 00 00  BRSET 0 PA,$0399
+  $0399: 00 00 00  BRSET 0 PA,$039C
+  $039C: 00 00 00  BRSET 0 PA,$039F
+  $039F: 00 00 00  BRSET 0 PA,$03A2
+  $03A2: 00 00 00  BRSET 0 PA,$03A5
+  $03A5: 00 00 00  BRSET 0 PA,$03A8
+  $03A8: 00 00 00  BRSET 0 PA,$03AB
+  $03AB: 00 00 00  BRSET 0 PA,$03AE
+  $03AE: 00 00 00  BRSET 0 PA,$03B1
+  $03B1: 00 00 00  BRSET 0 PA,$03B4
+  $03B4: 00 00 00  BRSET 0 PA,$03B7
+  $03B7: 00 00 00  BRSET 0 PA,$03BA
+  $03BA: 00 00 00  BRSET 0 PA,$03BD
+  $03BD: 00 00 00  BRSET 0 PA,$03C0
+  $03C0: 00 00 00  BRSET 0 PA,$03C3
+  $03C3: 00 00 00  BRSET 0 PA,$03C6
+  $03C6: 00 00 00  BRSET 0 PA,$03C9
+  $03C9: 00 00 00  BRSET 0 PA,$03CC
+  $03CC: 00 00 00  BRSET 0 PA,$03CF
+  $03CF: 00 00 00  BRSET 0 PA,$03D2
+  $03D2: 00 00 00  BRSET 0 PA,$03D5
+  $03D5: 00 00 00  BRSET 0 PA,$03D8
+  $03D8: 00 00 00  BRSET 0 PA,$03DB
+  $03DB: 00 00 00  BRSET 0 PA,$03DE
+  $03DE: 00 00 00  BRSET 0 PA,$03E1
+  $03E1: 00 00 00  BRSET 0 PA,$03E4
+  $03E4: 00 00 00  BRSET 0 PA,$03E7
+  $03E7: 00 00 00  BRSET 0 PA,$03EA
+  $03EA: 00 00 00  BRSET 0 PA,$03ED
+  $03ED: 00 00 00  BRSET 0 PA,$03F0
+  $03F0: 00 00 00  BRSET 0 PA,$03F3
+  $03F3: 00 00 00  BRSET 0 PA,$03F6
+  $03F6: 00 00 00  BRSET 0 PA,$03F9
+  $03F9: 00 00 00  BRSET 0 PA,$03FC
+  $03FC: 00 00 00  BRSET 0 PA,$03FF
+  $03FF: 00 00 00  BRSET 0 PA,$0402
+  $0402: 00 00 00  BRSET 0 PA,$0405
+  $0405: 00 00 00  BRSET 0 PA,$0408
+  $0408: 00 00 00  BRSET 0 PA,$040B
+  $040B: 00 00 00  BRSET 0 PA,$040E
+  $040E: 00 00 00  BRSET 0 PA,$0411
+  $0411: 00 00 00  BRSET 0 PA,$0414
+  $0414: 00 00 00  BRSET 0 PA,$0417
+  $0417: 00 00 00  BRSET 0 PA,$041A
+  $041A: 00 00 00  BRSET 0 PA,$041D
+  $041D: 00 00 00  BRSET 0 PA,$0420
+  $0420: 00 00 00  BRSET 0 PA,$0423
+  $0423: 00 00 00  BRSET 0 PA,$0426
+  $0426: 00 00 00  BRSET 0 PA,$0429
+  $0429: 00 00 00  BRSET 0 PA,$042C
+  $042C: 00 00 00  BRSET 0 PA,$042F
+  $042F: 00 00 00  BRSET 0 PA,$0432
+  $0432: 00 00 00  BRSET 0 PA,$0435
+  $0435: 00 00 00  BRSET 0 PA,$0438
+  $0438: 00 00 00  BRSET 0 PA,$043B
+  $043B: 00 00 00  BRSET 0 PA,$043E
+  $043E: 00 00 00  BRSET 0 PA,$0441
+  $0441: 00 00 00  BRSET 0 PA,$0444
+  $0444: 00 00 00  BRSET 0 PA,$0447
+  $0447: 00 00 00  BRSET 0 PA,$044A
+  $044A: 00 00 00  BRSET 0 PA,$044D
+  $044D: 00 00 00  BRSET 0 PA,$0450
+  $0450: 00 00 00  BRSET 0 PA,$0453
+  $0453: 00 00 00  BRSET 0 PA,$0456
+  $0456: 00 00 00  BRSET 0 PA,$0459
+  $0459: 00 00 00  BRSET 0 PA,$045C
+  $045C: 00 00 00  BRSET 0 PA,$045F
+  $045F: 00 00 00  BRSET 0 PA,$0462
+  $0462: 00 00 00  BRSET 0 PA,$0465
+  $0465: 00 00 00  BRSET 0 PA,$0468
+  $0468: 00 00 00  BRSET 0 PA,$046B
+  $046B: 00 00 00  BRSET 0 PA,$046E
+  $046E: 00 00 00  BRSET 0 PA,$0471
+  $0471: 00 00 00  BRSET 0 PA,$0474
+  $0474: 00 00 00  BRSET 0 PA,$0477
+  $0477: 00 00 00  BRSET 0 PA,$047A
+  $047A: 00 00 00  BRSET 0 PA,$047D
+  $047D: 00 00 00  BRSET 0 PA,$0480
+  $0480: 00 00 00  BRSET 0 PA,$0483
+  $0483: 00 00 00  BRSET 0 PA,$0486
+  $0486: 00 00 00  BRSET 0 PA,$0489
+  $0489: 00 00 00  BRSET 0 PA,$048C
+  $048C: 00 00 00  BRSET 0 PA,$048F
+  $048F: 00 00 00  BRSET 0 PA,$0492
+  $0492: 00 00 00  BRSET 0 PA,$0495
+  $0495: 00 00 00  BRSET 0 PA,$0498
+  $0498: 00 00 00  BRSET 0 PA,$049B
+  $049B: 00 00 00  BRSET 0 PA,$049E
+  $049E: 00 00 00  BRSET 0 PA,$04A1
+  $04A1: 00 00 00  BRSET 0 PA,$04A4
+  $04A4: 00 00 00  BRSET 0 PA,$04A7
+  $04A7: 00 00 00  BRSET 0 PA,$04AA
+  $04AA: 00 00 00  BRSET 0 PA,$04AD
+  $04AD: 00 00 00  BRSET 0 PA,$04B0
+  $04B0: 00 00 00  BRSET 0 PA,$04B3
+  $04B3: 00 00 00  BRSET 0 PA,$04B6
+  $04B6: 00 00 00  BRSET 0 PA,$04B9
+  $04B9: 00 00 00  BRSET 0 PA,$04BC
+  $04BC: 00 00 00  BRSET 0 PA,$04BF
+  $04BF: 00 00 00  BRSET 0 PA,$04C2
+  $04C2: 00 00 00  BRSET 0 PA,$04C5
+  $04C5: 00 00 00  BRSET 0 PA,$04C8
+  $04C8: 00 00 00  BRSET 0 PA,$04CB
+  $04CB: 00 00 00  BRSET 0 PA,$04CE
+  $04CE: 00 00 00  BRSET 0 PA,$04D1
+  $04D1: 00 00 00  BRSET 0 PA,$04D4
+  $04D4: 00 00 00  BRSET 0 PA,$04D7
+  $04D7: 00 00 00  BRSET 0 PA,$04DA
+  $04DA: 00 00 00  BRSET 0 PA,$04DD
+  $04DD: 00 00 00  BRSET 0 PA,$04E0
+  $04E0: 00 00 00  BRSET 0 PA,$04E3
+  $04E3: 00 00 00  BRSET 0 PA,$04E6
+  $04E6: 00 00 00  BRSET 0 PA,$04E9
+  $04E9: 00 00 00  BRSET 0 PA,$04EC
+  $04EC: 00 00 00  BRSET 0 PA,$04EF
+  $04EF: 00 00 00  BRSET 0 PA,$04F2
+  $04F2: 00 00 00  BRSET 0 PA,$04F5
+  $04F5: 00 00 00  BRSET 0 PA,$04F8
+  $04F8: 00 00 00  BRSET 0 PA,$04FB
+  $04FB: 00 00 00  BRSET 0 PA,$04FE
+  $04FE: 00 00 00  BRSET 0 PA,$0501
+  $0501: 00 00 00  BRSET 0 PA,$0504
+  $0504: 00 00 00  BRSET 0 PA,$0507
+  $0507: 00 00 00  BRSET 0 PA,$050A
+  $050A: 00 00 00  BRSET 0 PA,$050D
+  $050D: 00 00 00  BRSET 0 PA,$0510
+  $0510: 00 00 00  BRSET 0 PA,$0513
+  $0513: 00 00 00  BRSET 0 PA,$0516
+  $0516: 00 00 00  BRSET 0 PA,$0519
+  $0519: 00 00 00  BRSET 0 PA,$051C
+  $051C: 00 00 00  BRSET 0 PA,$051F
+  $051F: 00 00 00  BRSET 0 PA,$0522
+  $0522: 00 00 00  BRSET 0 PA,$0525
+  $0525: 00 00 00  BRSET 0 PA,$0528
+  $0528: 00 00 00  BRSET 0 PA,$052B
+  $052B: 00 00 00  BRSET 0 PA,$052E
+  $052E: 00 00 00  BRSET 0 PA,$0531
+  $0531: 00 00 00  BRSET 0 PA,$0534
+  $0534: 00 00 00  BRSET 0 PA,$0537
+  $0537: 00 00 00  BRSET 0 PA,$053A
+  $053A: 00 00 00  BRSET 0 PA,$053D
+  $053D: 00 00 00  BRSET 0 PA,$0540
+  $0540: 00 00 00  BRSET 0 PA,$0543
+  $0543: 00 00 00  BRSET 0 PA,$0546
+  $0546: 00 00 00  BRSET 0 PA,$0549
+  $0549: 00 00 00  BRSET 0 PA,$054C
+  $054C: 00 00 00  BRSET 0 PA,$054F
+  $054F: 00 00 00  BRSET 0 PA,$0552
+  $0552: 00 00 00  BRSET 0 PA,$0555
+  $0555: 00 00 00  BRSET 0 PA,$0558
+  $0558: 00 00 00  BRSET 0 PA,$055B
+  $055B: 00 00 00  BRSET 0 PA,$055E
+  $055E: 00 00 00  BRSET 0 PA,$0561
+  $0561: 00 00 00  BRSET 0 PA,$0564
+  $0564: 00 00 00  BRSET 0 PA,$0567
+  $0567: 00 00 00  BRSET 0 PA,$056A
+  $056A: 00 00 00  BRSET 0 PA,$056D
+  $056D: 00 00 00  BRSET 0 PA,$0570
+  $0570: 00 00 00  BRSET 0 PA,$0573
+  $0573: 00 00 00  BRSET 0 PA,$0576
+  $0576: 00 00 00  BRSET 0 PA,$0579
+  $0579: 00 00 00  BRSET 0 PA,$057C
+  $057C: 00 00 00  BRSET 0 PA,$057F
+  $057F: 00 00 00  BRSET 0 PA,$0582
+  $0582: 00 00 00  BRSET 0 PA,$0585
+  $0585: 00 00 00  BRSET 0 PA,$0588
+  $0588: 00 00 00  BRSET 0 PA,$058B
+  $058B: 00 00 00  BRSET 0 PA,$058E
+  $058E: 00 00 00  BRSET 0 PA,$0591
+  $0591: 00 00 00  BRSET 0 PA,$0594
+  $0594: 00 00 00  BRSET 0 PA,$0597
+  $0597: 00 00 00  BRSET 0 PA,$059A
+  $059A: 00 00 00  BRSET 0 PA,$059D
+  $059D: 00 00 00  BRSET 0 PA,$05A0
+  $05A0: 00 00 00  BRSET 0 PA,$05A3
+  $05A3: 00 00 00  BRSET 0 PA,$05A6
+  $05A6: 00 00 00  BRSET 0 PA,$05A9
+  $05A9: 00 00 00  BRSET 0 PA,$05AC
+  $05AC: 00 00 00  BRSET 0 PA,$05AF
+  $05AF: 00 00 00  BRSET 0 PA,$05B2
+  $05B2: 00 00 00  BRSET 0 PA,$05B5
+  $05B5: 00 00 00  BRSET 0 PA,$05B8
+  $05B8: 00 00 00  BRSET 0 PA,$05BB
+  $05BB: 00 00 00  BRSET 0 PA,$05BE
+
+=================================================================
+ROM: yy101 (Electric Yo-Yo MCU)
+  RESET:$0251  /IRQ:$052B  Timer:$0251  SWI:$0251
+=================================================================
+
+--- Full EPROM (user code $0080-$07FF) ---
+  $0080: 02 03 D7  BRSET 1 $03,$005A
+  $0083: FA        ???FA 
+  $0084: 97        ???97 
+  $0085: FA        ???FA 
+  $0086: 96        ???96 
+  $0087: FB        ???FB 
+  $0088: 96        ???96 
+  $0089: FB        ???FB 
+  $008A: 96        ???96 
+  $008B: F8        ???F8 
+  $008C: 85        CLC 
+  $008D: 10 26     BSET 0 $26
+  $008F: 43        COMA 
+  $0090: 44        LSRA 
+  $0091: 24 10     BCC $00A3
+  $0093: 96        ???96 
+  $0094: F9        ???F9 
+  $0095: 81        RTS 
+  $0096: 7E        ???7E 
+  $0097: 10 27     BSET 0 $27
+  $0099: 15 20     BCLR 2 $20
+  $009B: D6 FA C5  LDA $FAC5,X
+  $009E: 02 27 FA  BRSET 1 $27,$009B
+  $00A1: 97        ???97 
+  $00A2: FB        ???FB 
+  $00A3: 96        ???96 
+  $00A4: FA        ???FA 
+  $00A5: 44        LSRA 
+  $00A6: 24 0E     BCC $00B6
+  $00A8: 96        ???96 
+  $00A9: FB        ???FB 
+  $00AA: A7 A0     ???A7 $A0
+  $00AC: 10 8C     BSET 0 $8C
+  $00AE: 9B        ???9B 
+  $00AF: E0 26     SUB $26,X
+  $00B1: 04 10 8E  BRSET 2 $10,$0042
+  $00B4: 9B        ???9B 
+  $00B5: 80        RTI 
+  $00B6: 10 AF     BSET 0 $AF
+  $00B8: E3 11     ???E3 $11,X
+  $00BA: A3 E1     CPX # #$E1
+  $00BC: 27 CC     BEQ $008A
+  $00BE: D6 F8 C5  LDA $F8C5,X
+  $00C1: 02 27 C6  BRSET 1 $27,$008A
+  $00C4: A6 C0     LDA # #$C0
+  $00C6: 97        ???97 
+  $00C7: F9        ???F9 
+  $00C8: 11 83     BCLR 0 $83
+  $00CA: 9B        ???9B 
+  $00CB: E0 26     SUB $26,X
+  $00CD: BC CE     JMP $CE
+  $00CF: 9B        ???9B 
+  $00D0: 80        RTI 
+  $00D1: 20 B7     BRA $008A
+  $00D3: CC 62 03  JMP $6203
+  $00D6: 97        ???97 
+  $00D7: FA        ???FA 
+  $00D8: 86        SEC 
+  $00D9: 0A D7 F8  BRSET 5 $D7,$00D4
+  $00DC: 97        ???97 
+  $00DD: F8        ???F8 
+  $00DE: 8E        TXA 
+  $00DF: 01 80 30  BRCLR 0 $80,$0112
+  $00E2: 1F 26     BCLR 7 $26
+  $00E4: FC        ???FC 
+  $00E5: 96        ???96 
+  $00E6: F8        ???F8 
+  $00E7: 85        CLC 
+  $00E8: 10 26     BSET 0 $26
+  $00EA: ED D7     ???ED $D7,X
+  $00EC: F8        ???F8 
+  $00ED: 5A        DECX 
+  $00EE: D7 FA C6  STA $FAC6,X
+  $00F1: 0A D7 F8  BRSET 5 $D7,$00EC
+  $00F4: 8E        TXA 
+  $00F5: 9F        ???9F 
+  $00F6: 39 BD     ROL $BD
+  $00F8: 9D        NOP 
+  $00F9: A3 96     CPX # #$96
+  $00FB: FB        ???FB 
+  $00FC: 8E        TXA 
+  $00FD: 01 80 30  BRCLR 0 $80,$0130
+  $0100: 1F 26     BCLR 7 $26
+  $0102: FC        ???FC 
+  $0103: 96        ???96 
+  $0104: FB        ???FB 
+  $0105: 20 83     BRA $008A
+  $0107: 96        ???96 
+  $0108: 9D        NOP 
+  $0109: 26 11     BNE $011C
+  $010B: 96        ???96 
+  $010C: 97        ???97 
+  $010D: 27 17     BEQ $0126
+  $010F: 8D 46     BSR $0157
+  $0111: 8E        TXA 
+  $0112: 9F        ???9F 
+  $0113: 3C D6     INC $D6
+  $0115: AB C4     ADD # #$C4
+  $0117: 7F        CLR ,X 
+  $0118: 3A BD     DEC $BD
+  $011A: 9D        NOP 
+  $011B: A3 96     CPX # #$96
+  $011D: B1 8D     CMP $8D
+  $011F: 1E 96     BSET 7 $96
+  $0121: B2 8D     SBC $8D
+  $0123: 1A 0F     BSET 5 $0F
+  $0125: 9D        NOP 
+  $0126: 8E        TXA 
+  $0127: 8F        ???8F 
+  $0128: AB BD     ADD # #$BD
+  $012A: 9D        NOP 
+  $012B: A3 BD     CPX # #$BD
+  $012D: 9E        ???9E 
+  $012E: 3F 97     CLR $97
+  $0130: B4 0F     AND $0F
+  $0132: B3 8D     CPX $8D
+  $0134: 09 86 20  BRCLR 4 $86,$0157
+  $0137: 97        ???97 
+  $0138: 97        ???97 
+  $0139: 97        ???97 
+  $013A: 9E        ???9E 
+  $013B: 7E        ???7E 
+  $013C: 9D        NOP 
+  $013D: 87        ROP 
+  $013E: 34 12     LSR $12
+  $0140: 8E        TXA 
+  $0141: 9F        ???9F 
+  $0142: 57        ASRX 
+  $0143: 44        LSRA 
+  $0144: 44        LSRA 
+  $0145: 44        LSRA 
+  $0146: 44        LSRA 
+  $0147: A6 86     LDA # #$86
+  $0149: BD 9D     JSR $9D
+  $014B: 87        ROP 
+  $014C: A6 E4     LDA # #$E4
+  $014E: 84        TAX 
+  $014F: 0F A6 86  BRCLR 7 $A6,$00D8
+  $0152: BD 9D     JSR $9D
+  $0154: 87        ROP 
+  $0155: 35        ???35 
+  $0156: 92        ???92 
+  $0157: 96        ???96 
+  $0158: 9E        ???9E 
+  $0159: 26 13     BNE $016E
+  $015B: 96        ???96 
+  $015C: B4 BD     AND $BD
+  $015E: 9E        ???9E 
+  $015F: 69 A7     ROL $A7,X
+  $0161: E2 BD     ???E2 $BD,X
+  $0163: 9E        ???9E 
+  $0164: 3F A1     CLR $A1
+  $0166: E0 27     SUB $27,X
+  $0168: 05 86 07  BRCLR 2 $86,$0172
+  $016B: BD 9D     JSR $9D
+  $016D: 87        ROP 
+  $016E: 39 8D     ROL $8D
+  $0170: E6 9E     LDA $9E,X
+  $0172: B1 30     CMP $30
+  $0174: 1F 9F     BCLR 7 $9F
+  $0176: B1 86     CMP $86
+  $0178: 01 97 9E  BRCLR 0 $97,$0119
+  $017B: 97        ???97 
+  $017C: 97        ???97 
+  $017D: 7E        ???7E 
+  $017E: 89        SEI 
+  $017F: 07 8D D5  BRCLR 3 $8D,$0157
+  $0182: 96        ???96 
+  $0183: AB 26     ADD # #$26
+  $0185: 06 9E B1  BRSET 3 $9E,$0139
+  $0188: 30 01     NEG PB
+  $018A: 20 E9     BRA $0175
+  $018C: 2B 06     BMI $0194
+  $018E: 9E        ???9E 
+  $018F: B1 30     CMP $30
+  $0191: 1F 20     BCLR 7 $20
+  $0193: E1 9E     ???E1 $9E,X
+  $0195: B1 30     CMP $30
+  $0197: 89        SEI 
+  $0198: 01 00 20  BRCLR 0 PA,$01BB
+  $019B: D9 8D B9  ???D9 $8DB9,X
+  $019E: 96        ???96 
+  $019F: AB 2B     ADD # #$2B
+  $01A1: 08 9E B1  BRSET 4 $9E,$0155
+  $01A4: 30 89     NEG $89
+  $01A6: 01 00 20  BRCLR 0 PA,$01C9
+  $01A9: CB 9E B1  ADD $9EB1
+  $01AC: 30 01     NEG PB
+  $01AE: 20 C5     BRA $0175
+  $01B0: 8D A5     BSR $0157
+  $01B2: 96        ???96 
+  $01B3: AB 2B     ADD # #$2B
+  $01B5: 08 9E B1  BRSET 4 $9E,$0169
+  $01B8: 30 89     NEG $89
+  $01BA: FF        STX ,X 
+  $01BB: 00 20 B7  BRSET 0 $20,$0175
+  $01BE: 9E        ???9E 
+  $01BF: B1 30     CMP $30
+  $01C1: 1F 20     BCLR 7 $20
+  $01C3: B1 86     CMP $86
+  $01C5: 0A BD 9D  BRSET 5 $BD,$0165
+  $01C8: 87        ROP 
+  $01C9: 8D 8C     BSR $0157
+  $01CB: 96        ???96 
+  $01CC: AB 2B     ADD # #$2B
+  $01CE: 06 9E B1  BRSET 3 $9E,$0182
+  $01D1: 30 01     NEG PB
+  $01D3: 20 A0     BRA $0175
+  $01D5: 9E        ???9E 
+  $01D6: B1 30     CMP $30
+  $01D8: 89        SEI 
+  $01D9: FF        STX ,X 
+  $01DA: 00 20 98  BRSET 0 $20,$0175
+  $01DD: 96        ???96 
+  $01DE: 97        ???97 
+  $01DF: 27 07     BEQ $01E8
+  $01E1: 0F 97 BD  BRCLR 7 $97,$01A1
+  $01E4: 89        SEI 
+  $01E5: 57        ASRX 
+  $01E6: 0C 9D 7E  BRSET 6 $9D,$0267
+  $01E9: 9D        NOP 
+  $01EA: 93        ???93 
+  $01EB: 0F B1 0F  BRCLR 7 $B1,$01FD
+  $01EE: B2 20     SBC $20
+  $01F0: F5        ???F5 
+  $01F1: 34 12     LSR $12
+  $01F3: CE 9B 80  LDX $9B80
+  $01F6: BD 9D     JSR $9D
+  $01F8: 3F A7     CLR $A7
+  $01FA: C0 81 0D  SUB $810D
+  $01FD: 27 2B     BEQ $022A
+  $01FF: 11 83     BCLR 0 $83
+  $0201: 9B        ???9B 
+  $0202: E0 27     SUB $27,X
+  $0204: 11 81     BCLR 0 $81
+  $0206: 7F        CLR ,X 
+  $0207: 27 0F     BEQ $0218
+  $0209: 81        RTS 
+  $020A: 18 27     BSET 4 $27
+  $020C: 09 81 20  BRCLR 4 $81,$022F
+  $020F: 25 15     BCS $0226
+  $0211: BD 9D     JSR $9D
+  $0213: 87        ROP 
+  $0214: 20 E0     BRA $01F6
+  $0216: 35        ???35 
+  $0217: 92        ???92 
+  $0218: 11 83     BCLR 0 $83
+  $021A: 9B        ???9B 
+  $021B: 81        RTS 
+  $021C: 27 08     BEQ $0226
+  $021E: 8E        TXA 
+  $021F: 8F        ???8F 
+  $0220: AE BD     LDX # #$BD
+  $0222: 9D        NOP 
+  $0223: A3 33     CPX # #$33
+  $0225: 5F        CLRX 
+  $0226: 33 5F     COM $5F
+  $0228: 20 CC     BRA $01F6
+  $022A: 86        SEC 
+  $022B: 01 35 92  BRCLR 0 $35,$01C0
+  $022E: A6 80     LDA # #$80
+  $0230: 27 12     BEQ $0244
+  $0232: D6 FA C5  LDA $FAC5,X
+  $0235: 02 27 FA  BRSET 1 $27,$0232
+  $0238: 97        ???97 
+  $0239: FB        ???FB 
+  $023A: 86        SEC 
+  $023B: 08 5A 26  BRSET 4 $5A,$0264
+  $023E: FD        ???FD 
+  $023F: 4A        DECA 
+  $0240: 26 FA     BNE $023C
+  $0242: 20 EA     BRA $022E
+  $0244: 39 96     ROL $96
+  $0246: FA        ???FA 
+  $0247: 44        LSRA 
+  $0248: 24 FB     BCC $0245
+  $024A: 96        ???96 
+  $024B: FB        ???FB 
+  $024C: 39 86     ROL $86
+  $024E: 01 20 01  BRCLR 0 $20,$0252
+  $0251: 9B        ???9B 
+  $0252: AE 10     LDX # #$10
+  $0254: 7F        CLR ,X 
+  $0255: 5C        INCX 
+  $0256: 2A FC     BPL $0254
+  $0258: A6 FF     LDA # #$FF
+  $025A: B7 04     STA DDRA
+  $025C: 3F 01     CLR PB
+  $025E: A6 E0     LDA # #$E0
+  $0260: B7 05     STA DDRB
+  $0262: 9A        ???9A 
+  $0263: B6 02     LDA PC
+  $0265: A4 07     AND # #$07
+  $0267: 48        LSLA 
+  $0268: B7 12     STA $12
+  $026A: B6 01     LDA PB
+  $026C: A4 10     AND # #$10
+  $026E: BA 12     ORA $12
+  $0270: 48        LSLA 
+  $0271: 48        LSLA 
+  $0272: 48        LSLA 
+  $0273: B7 12     STA $12
+  $0275: B6 01     LDA PB
+  $0277: A4 0F     AND # #$0F
+  $0279: BA 12     ORA $12
+  $027B: B7 12     STA $12
+  $027D: BE 11     LDX $11
+  $027F: 26 02     BNE $0283
+  $0281: B8 10     EOR $10
+  $0283: B7 00     STA PA
+  $0285: 20 DC     BRA $0263
+  $0287: C4 86 3F  AND $863F
+  $028A: BD 9E     JSR $9E
+  $028C: 69 BD     ROL $BD,X
+  $028E: 9E        ???9E 
+  $028F: 3F 81     CLR $81
+  $0291: 3F 27     CLR $27
+  $0293: 11 8E     BCLR 0 $8E
+  $0295: 8A        RSP 
+  $0296: 99        ???99 
+  $0297: 20 E2     BRA $027B
+  $0299: 07 0D 0A  BRCLR 3 $0D,$02A6
+  $029C: 52        ???52 
+  $029D: 4F        CLRA 
+  $029E: 4D        TSTA 
+  $029F: 20 41     BRA $02E2
+  $02A1: 52        ???52 
+  $02A2: 45        ???45 
+  $02A3: 41        ???41 
+  $02A4: 00 AF 5E  BRSET 0 $AF,$0305
+  $02A7: A6 C4     LDA # #$C4
+  $02A9: BD 9E     JSR $9E
+  $02AB: 69 96     ROL $96,X
+  $02AD: 94        ???94 
+  $02AE: A7 41     ???A7 $41
+  $02B0: 7E        ???7E 
+  $02B1: 9D        NOP 
+  $02B2: 93        ???93 
+  $02B3: 8E        TXA 
+  $02B4: 9F        ???9F 
+  $02B5: 39 BD     ROL $BD
+  $02B7: 9D        NOP 
+  $02B8: A3 C6     CPX # #$C6
+  $02BA: 08 A6 C4  BRSET 4 $A6,$0281
+  $02BD: BD 89     JSR $89
+  $02BF: 3E        ???3E 
+  $02C0: A6 41     LDA # #$41
+  $02C2: BD 89     JSR $89
+  $02C4: 3E        ???3E 
+  $02C5: 86        SEC 
+  $02C6: 74        LSR ,X 
+  $02C7: 6D 43     TST $43,X
+  $02C9: 26 02     BNE $02CD
+  $02CB: 86        SEC 
+  $02CC: 20 BD     BRA $028B
+  $02CE: 9D        NOP 
+  $02CF: 87        ROP 
+  $02D0: 86        SEC 
+  $02D1: 20 BD     BRA $0290
+  $02D3: 9D        NOP 
+  $02D4: 87        ROP 
+  $02D5: 33 44     COM $44
+  $02D7: 5A        DECX 
+  $02D8: 26 E1     BNE $02BB
+  $02DA: 7E        ???7E 
+  $02DB: 9D        NOP 
+  $02DC: 93        ???93 
+  $02DD: 8E        TXA 
+  $02DE: 8A        RSP 
+  $02DF: F8        ???F8 
+  $02E0: 20 99     BRA $027B
+  $02E2: 0D 0A 07  BRCLR 6 $0A,$02EC
+  $02E5: 42        ???42 
+  $02E6: 52        ???52 
+  $02E7: 45        ???45 
+  $02E8: 41        ???41 
+  $02E9: 4B        ???4B 
+  $02EA: 20 54     BRA $0340
+  $02EC: 41        ???41 
+  $02ED: 42        ???42 
+  $02EE: 4C        INCA 
+  $02EF: 45        ???45 
+  $02F0: 20 46     BRA $0338
+  $02F2: 55        ???55 
+  $02F3: 4C        INCA 
+  $02F4: 4C        INCA 
+  $02F5: 0D 0A 00  BRCLR 6 $0A,$02F8
+  $02F8: 0D 0A 07  BRCLR 6 $0A,$0302
+  $02FB: 44        LSRA 
+  $02FC: 55        ???55 
+  $02FD: 50        NEGX 
+  $02FE: 4C        INCA 
+  $02FF: 49        ROLA 
+  $0300: 43        COMA 
+  $0301: 41        ???41 
+  $0302: 54        LSRX 
+  $0303: 45        ???45 
+  $0304: 20 45     BRA $034B
+  $0306: 4E        ???4E 
+  $0307: 54        LSRX 
+  $0308: 52        ???52 
+  $0309: 59        ROLX 
+  $030A: 0D 0A 00  BRCLR 6 $0A,$030D
+  $030D: 0C AA 86  BRSET 6 $AA,$0296
+  $0310: 20 BD     BRA $02CF
+  $0312: 9D        NOP 
+  $0313: 87        ROP 
+  $0314: 0C A7 9E  BRSET 6 $A7,$02B5
+  $0317: 86        SEC 
+  $0318: 9F        ???9F 
+  $0319: B1 BD     CMP $BD
+  $031B: 9E        ???9E 
+  $031C: 3F 81     CLR $81
+  $031E: 39 27     ROL $27
+  $0320: 0E 81 35  BRSET 7 $81,$0358
+  $0323: 26 0E     BNE $0333
+  $0325: 30 01     NEG PB
+  $0327: 9F        ???9F 
+  $0328: B1 BD     CMP $BD
+  $032A: 9E        ???9E 
+  $032B: 3F 4D     CLR $4D
+  $032D: 2A 04     BPL $0333
+  $032F: 0F A7 0F  BRCLR 7 $A7,$0341
+  $0332: AA BD     ORA # #$BD
+  $0334: 98        ???98 
+  $0335: 00 9F A4  BRSET 0 $9F,$02DC
+  $0338: 9F        ???9F 
+  $0339: B1 BD     CMP $BD
+  $033B: 9E        ???9E 
+  $033C: 3F 97     CLR $97
+  $033E: A6 86     LDA # #$86
+  $0340: 3F BD     CLR $BD
+  $0342: 9E        ???9E 
+  $0343: 69 BD     ROL $BD,X
+  $0345: 9E        ???9E 
+  $0346: 3F 81     CLR $81
+  $0348: 3F 26     CLR $26
+  $034A: 03 7E 9E  BRCLR 1 $7E,$02EB
+  $034D: D4 8E 8A  ???D4 $8E8A,X
+  $0350: 99        ???99 
+  $0351: BD 9D     JSR $9D
+  $0353: A3 0F     CPX # #$0F
+  $0355: A7 0F     ???A7 $0F
+  $0357: A4 0F     AND # #$0F
+  $0359: A5 0F     BIT # #$0F
+  $035B: AA 7E     ORA # #$7E
+  $035D: 9D        NOP 
+  $035E: 93        ???93 
+  $035F: BD 9D     JSR $9D
+  $0361: 3F BD     CLR $BD
+  $0363: 9D        NOP 
+  $0364: 87        ROP 
+  $0365: 0F 94 81  BRCLR 7 $94,$02E9
+  $0368: 49        ROLA 
+  $0369: 26 06     BNE $0371
+  $036B: 0F 9B 0F  BRCLR 7 $9B,$037D
+  $036E: 9C        ???9C 
+  $036F: 20 24     BRA $0395
+  $0371: 81        RTS 
+  $0372: 4A        DECA 
+  $0373: 27 7E     BEQ $03F3
+  $0375: 81        RTS 
+  $0376: 56        RORX 
+  $0377: 27 1F     BEQ $0398
+  $0379: 0C 94 81  BRSET 6 $94,$02FD
+  $037C: 54        LSRX 
+  $037D: 27 19     BEQ $0398
+  $037F: CE 8B FA  LDX $8BFA
+  $0382: A1 C4     CMP # #$C4
+  $0384: 10 27     BSET 0 $27
+  $0386: 00 96 33  BRSET 0 $96,$03BC
+  $0389: 44        LSRA 
+  $038A: 11 83     BCLR 0 $83
+  $038C: 8C        ???8C 
+  $038D: 1E 26     BSET 7 $26
+  $038F: F2        ???F2 
+  $0390: 86        SEC 
+  $0391: 07 BD 9D  BRCLR 3 $BD,$0331
+  $0394: 87        ROP 
+  $0395: 7E        ???7E 
+  $0396: 9D        NOP 
+  $0397: 93        ???93 
+  $0398: 96        ???96 
+  $0399: 9D        NOP 
+  $039A: 27 1C     BEQ $03B8
+  $039C: 8D 02     BSR $03A0
+  $039E: 20 F5     BRA $0395
+  $03A0: CE 9F B5  LDX $9FB5
+  $03A3: A6 43     LDA # #$43
+  $03A5: 91        ???91 
+  $03A6: 94        ???94 
+  $03A7: 26 06     BNE $03AF
+  $03A9: 6F C4     CLR $C4,X
+  $03AB: 6F 41     CLR $41,X
+  $03AD: 6F 43     CLR $43,X
+  $03AF: 33 44     COM $44
+  $03B1: 11 83     BCLR 0 $83
+  $03B3: 9F        ???9F 
+  $03B4: D5 26 EC  ???D5 $26EC,X
+  $03B7: 39 CE     ROL $CE
