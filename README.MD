@@ -1,3 +1,8 @@
+-=(Qix_Senhor notes)=-
+
+Tested: Working Video 720p, 1080p & Sound.
+
+___
 <p align="center">
   <img src="Useful Information/Qix.png" width="800">
   <img src="Useful Information/ComplexX.png" width="800">
